@@ -109,6 +109,8 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 - **0.1.0** Initial release
 
+- **0.1.5** Task callback
+
 ## License
 
 Copyright (c) 2015 Efim Solovyev. Licensed under the MIT license.
