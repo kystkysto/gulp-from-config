@@ -18,6 +18,30 @@
 $ npm install gulp gulp-load-plugins gulp-from-config
 ```
 
+## As simple as
+
+### write tasks in configs
+
+```javascript
+
+// Load gulp with plugins loader and gulp-from-config
+var gulp = require('gulp'),
+    gulpPlugins = require('gulp-load-plugins')(),
+    gulpFromConfig = require('gulp-from-config');
+
+    // Set config files path
+    gulpFromConfig.setConfigsPath('configs');
+
+    // Create tasks
+    gulpFromConfig.createTasks(gulp, gulpPlugins);
+```
+
+### and run them as any other gulp tasks from console:
+
+```bash
+$ gulp dev
+```
+
 ## Usage
 
 ```javascript
@@ -89,7 +113,7 @@ var gulp = require('gulp'),
 
 ```javascript
 {
-    "name": "test", // task name which can be called by 'gulp test'
+    "name": "production", // task name which can be called by 'gulp production'
     "subTasks": [
         {
             "name": "script", // sub task name
@@ -119,6 +143,7 @@ var gulp = require('gulp'),
     ]
 };
 ```
+> Example production.json
 
 ## Contributing
 
