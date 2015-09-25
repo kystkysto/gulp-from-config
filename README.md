@@ -20,7 +20,7 @@ $ npm install gulp gulp-load-plugins gulp-from-config
 
 ## As simple as
 
-### write tasks in configs
+#### write tasks in configs
 
 ```javascript
 
@@ -36,7 +36,7 @@ var gulp = require('gulp'),
     gulpFromConfig.createTasks(gulp, gulpPlugins);
 ```
 
-### and run them as any other gulp tasks from console:
+#### and run them as any other gulp tasks from console:
 
 ```bash
 $ gulp dev
