@@ -17,7 +17,7 @@ var rootPath = process.cwd(),
  * @param {Object} gulp - instanse of gulp
  * @param {Object} gulpPlugins - instance of gulp-load-plugins
  */
-var defineTasks = function runTasks(gulp, gulpPlugins) {
+var createTasks = function createTasks(gulp, gulpPlugins) {
 
     var
     // Main config
@@ -68,8 +68,6 @@ var defineTasks = function runTasks(gulp, gulpPlugins) {
         var subTasks = [],
             subTaskName = '',
             subTaskWatch = '';
-
-        console.log(this);
 
         if(Array.isArray(config.subTasks) && config.subTasks.length) {
 
@@ -134,8 +132,6 @@ var defineTasks = function runTasks(gulp, gulpPlugins) {
      * @param {Object} subTask
      */
     function createSubTask(subTaskName, subTask) {
-
-        console.log(this);
 
         var taskCompletion = this.__taskCompletion;
 
@@ -529,5 +525,5 @@ module.exports = {
     setCallback: setCallback,
     setConfigs: setConfigs,
     setConfigsPath: setConfigsPath,
-    defineTasks: defineTasks
+    createTasks: createTasks
 };
