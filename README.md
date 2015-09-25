@@ -4,7 +4,9 @@
 
 ## Why
 
-- You don't want to struggle with task runner code, are you?
+- Team work on the same project without risk of breaking other tasks
+- Store multiple typical tasks as configs
+- Write clean and specific to applicaion gulpfile
 
 ### Caveates
 
@@ -21,31 +23,43 @@ $ npm install gulp gulp-load-plugins gulp-from-config
 ```javascript
 'use strict';
 
-// First require gulp, gulp-load-plugins and gulp-from-config
+/**
+ *  At the beginning load:
+ *  - gulp
+ *  - gulp-load-plugins
+ *  - gulp-from-config
+ */
 var gulp = require('gulp'),
     gulpPlugins = require('gulp-load-plugins')(),
     gulpFromConfig = require('gulp-from-config');
 
-    // Get configs from ./config directory
-    gulpFromConfig.setConfigsPath('config');
+    /**
+     *  First option is to get tasks from configs
+     *  and set path to files.
+     *
+     *  For example to ./configs directory
+     */
+    gulpFromConfig.setConfigsPath('configs');
 
-    // Or set configs array as parameter
+    /**
+     *  Or set array of configs as parameter
+     */
     var task = {
-        name: "task",
+        name: "shared", // module task name
             subTasks: [
                 {
-                    name: "script",
-                    dest: "/dest/js",
-                    sourcemaps: true,
+                    name: "script", // technical task name
+                    dest: "/dest/js", // path to build
+                    sourcemaps: true, // enable sourcemaps
                     src: {
                         include: [
-                            "/src/js/*.js"
+                            "/src/js/*.js" // files to proceed
                         ]
                     },
                     plugins: [
                         {
-                            name: "concat",
-                            options: "app.js"
+                            name: "concat", // will run gulp-concat
+                            options: "app.js" // wiil be passed to plugin parameter
                         }
                     ]
                 }
@@ -54,14 +68,19 @@ var gulp = require('gulp'),
 
     gulpFromConfig.setConfigs([task]);
 
-    // Pass callback which will be triggered on completion of subtasks
-    // it accept one parameter which is config of subtask of task
+    /**
+     *  Callback function can to be triggered on completion of subtasks
+     *  Sub task config is passed to callback parameter
+     */
     var callback = function(config) {
-        console.log(config);
+        console.log('Config:', config);
     }
     gulpFromConfig.setCallback(callback);
 
-    // Define tasks based on configs
+    /**
+     *  Define tasks based on configs
+     *  Run like normal gulp task 'gulp shared'
+     */
     gulpFromConfig.defineTasks(gulp, gulpPlugins);
 ```
 > Example gulpfile.js
@@ -73,24 +92,24 @@ var gulp = require('gulp'),
     "name": "test", // task name which can be called by 'gulp test'
     "subTasks": [
         {
-            "name": "script", //sub task name
-            "dest": "/dest/css", // gulp.dest('/dest/css')
-            "sourcemaps": true, // If sourcemaps are required
-            "watch": [ // by default all source files will be watched
-                "/src/sass/*.sass",
+            "name": "script", // sub task name
+            "dest": "/dest/css", // for gulp.dest('/dest/css')
+            "sourcemaps": true, // if sourcemaps are required
+            "watch": [ // if array is empty will watch src files
+                "/src/sass/*.sass", // watch changes on source files
                 "/src/sass/_*.sass"
             ],
             "src": {
                 "include": [
-                    "/src/sass/*.sass" // pattern for required sources
+                    "/src/sass/*.sass" // will be proceeded
                 ],
                 "exclude": [
-                    "/src/sass/_*.sass" // pattern for ignored by gulp sources
+                    "/src/sass/_*.sass" // will be ignored
                 ]
             },
             "plugins": [
                 {
-                    "name": "sass", // gulp-sass
+                    "name": "sass", // gulp-sass plugin
                     "options": {
                         "outputStyle": "compressed" // will be passed into gulp.pipe(sass(options))
                     }
