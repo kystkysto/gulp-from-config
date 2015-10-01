@@ -20,7 +20,14 @@ $ npm install gulp gulp-load-plugins gulp-from-config
 
 ## As simple as
 
-#### write tasks in configs
+Install plugins that you need:
+
+```bash
+# This command will install sass compiler for gulp
+$ npm install gulp-sass --save-dev
+```
+
+Write tasks in JSON configs and place them in ./configs folder
 
 ```javascript
 
@@ -36,9 +43,10 @@ var gulp = require('gulp'),
     gulpFromConfig.createTasks(gulp, gulpPlugins);
 ```
 
-#### and run them as any other gulp tasks from console:
+Run them as any other gulp tasks from console (task name):
 
 ```bash
+# This command will search for dev task and run it
 $ gulp dev
 ```
 
@@ -69,21 +77,26 @@ var gulp = require('gulp'),
      *  Or set array of configs as parameter
      */
     var task = {
-        name: "shared", // module task name
+        name: "styles", // module task name
             subTasks: [
                 {
                     name: "script", // technical task name
-                    dest: "/dest/js", // path to build
+                    dest: "/dest/css", // path to build
                     sourcemaps: true, // enable sourcemaps
                     src: {
                         include: [
-                            "/src/js/*.js" // files to proceed
+                            "/src/sass/*.sass" // files to proceed
+                        ],
+                        exclude: [
+                            "/src/sass/_*.sass" // files to ignore
                         ]
                     },
                     plugins: [
                         {
-                            name: "concat", // will run gulp-concat
-                            options: "app.js" // wiil be passed to plugin parameter
+                            "name": "sass", // gulp-sass plugin
+                            "options": {
+                                "outputStyle": "compressed" // wiil be passed to plugin parameter
+                            }
                         }
                     ]
                 }
@@ -117,25 +130,29 @@ var gulp = require('gulp'),
     "subTasks": [
         {
             "name": "script", // sub task name
-            "dest": "/dest/css", // for gulp.dest('/dest/css')
-            "sourcemaps": true, // if sourcemaps are required
+            "dest": "/dest/js", // for gulp.dest('/dest/css')
+            "sourcemaps": false, // if sourcemaps are required
+            "browserify": {
+                "transform": ["ractivate"] // Set extra browserify transforms,
+                "file": // You can specify file name. Will be task name by defult ('production')
+            },
             "watch": [ // if array is empty will watch src files
-                "/src/sass/*.sass", // watch changes on source files
-                "/src/sass/_*.sass"
+                "/src/js/*.js", // watch changes on source files
+                "/src/js/_*.js"
             ],
             "src": {
                 "include": [
-                    "/src/sass/*.sass" // will be proceeded
+                    "/src/js/*.js" // will be proceeded
                 ],
                 "exclude": [
-                    "/src/sass/_*.sass" // will be ignored
+                    "/src/js/_*.js" // will be ignored
                 ]
             },
             "plugins": [
                 {
-                    "name": "sass", // gulp-sass plugin
+                    "name": "uglify", // gulp-sass plugin
                     "options": {
-                        "outputStyle": "compressed" // will be passed into gulp.pipe(sass(options))
+                        "mangle": false // will be passed into gulp.pipe(uglify(options))
                     }
                 }
             ]
@@ -152,11 +169,11 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 
-- **0.2.0** Added browserify support
-
 - **0.1.0** Initial release
 
 - **0.1.5** Task callback
+
+- **0.2.0** Added browserify support
 
 ## License
 
