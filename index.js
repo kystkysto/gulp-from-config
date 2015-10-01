@@ -6,7 +6,6 @@
 
 // Root path
 var rootPath = process.cwd(),
-    fs = require('fs'),
     path = require('path'),
     glob = require('glob'),
     fileExists = require('file-exists'),
@@ -219,16 +218,16 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
 		
 		if(src.length) {
 
+            gutil.log('Browserify enabled:', gutil.colors.blue(true));
+
             src.forEach(function(e) {
                 entries = entries.concat(glob.sync(e));
             });
 
-            console.log(entries);
-
-				var b = browserify({
-					entries: entries,
-					debug: true
-				});
+            var b = browserify({
+                entries: entries,
+                debug: true
+            });
 
 			b = setTransforms(b, browserifyConfig.transform);
 			b = b.bundle();

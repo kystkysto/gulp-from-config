@@ -27,7 +27,7 @@ Install plugins that you need:
 $ npm install gulp-sass --save-dev
 ```
 
-Write tasks in JSON configs and place them in ./configs folder
+Write tasks in JSON configs and place them in ./configs or any other folder folder
 
 ```javascript
 
