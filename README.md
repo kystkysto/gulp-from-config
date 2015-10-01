@@ -140,6 +140,7 @@ var gulp = require('gulp'),
                 }
             ]
         }
+        }
     ]
 };
 ```
@@ -150,6 +151,8 @@ var gulp = require('gulp'),
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [gulp](http://gulpjs.com/).
 
 ## Release History
+
+- **0.2.0** Added browserify support
 
 - **0.1.0** Initial release
 

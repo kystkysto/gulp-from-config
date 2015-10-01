@@ -10,7 +10,10 @@ var rootPath = process.cwd(),
     path = require('path'),
     glob = require('glob'),
     fileExists = require('file-exists'),
-    gutil = require('gulp-util');
+    gutil = require('gulp-util'),
+	browserify = require('browserify'),
+    source = require('vinyl-source-stream'),
+    buffer = require('vinyl-buffer');
 
 /**
  * @access public
@@ -40,7 +43,7 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
         var configs = getConfigs.call(this),
             subTasks;
 
-        configs.forEach(function (config, i, arr) {
+        configs.forEach(function (config) {
 
             if(config.name) {
                 subTasks = createTask.call(this, config);
@@ -71,7 +74,7 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
 
         if(Array.isArray(config.subTasks) && config.subTasks.length) {
 
-            config.subTasks.forEach(function (subTask, i, arr) {
+            config.subTasks.forEach(function (subTask) {
 
                 if (!subTask.name) {
                     subTask.name = randomTaskName();
@@ -90,7 +93,7 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
                         subTasks.push(subTaskWatch);
                     }
 
-                    createSubTask.call(this, subTaskName, subTask);
+                    createSubTask.call(this, subTaskName, subTask, config.name);
                 }
             }.bind(this));
         } else {
@@ -131,16 +134,20 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
      * @param {string} subTaskName
      * @param {Object} subTask
      */
-    function createSubTask(subTaskName, subTask) {
+    function createSubTask(subTaskName, subTask, taskName) {
 
         var taskCompletion = this.__taskCompletion;
 
         gulp.task(subTaskName, function (taskCompletion) {
 
-            var
-                //dest = rootPath + mainConfig.paths.dest + subTask.dest,
-                dest = rootPath + subTask.dest,
-                task = setSrc(subTask.src);
+            var task = {},
+                dest = rootPath + subTask.dest;
+
+                if(subTask.browserify) {
+                    task = setBrowserify(subTask.src, subTask.browserify, taskName)
+                } else {
+                    task = setSrc(subTask.src);
+                }
 
             task = setPipes(task, subTask.plugins, subTask.sourcemaps);
 
@@ -152,14 +159,14 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
         }.bind(this, taskCompletion));
     }
 
-    /**
-     * Set source paths
+	/**
+     * Prepare source patshs
      * @access private
      * @param {Object} srcPaths
-     * @returns {*}
-     */
-    function setSrc(srcPaths) {
-
+     * @returns Array
+	 */
+	function prepareSrc(srcPaths) {
+		
         var src = [],
             include = [];
 
@@ -171,17 +178,108 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
 
             if(Array.isArray(srcPaths.exclude) && srcPaths.exclude.length) {
 
-                srcPaths.exclude.forEach(function (path, i, arr) {
+                srcPaths.exclude.forEach(function (path) {
 
-                    //src.push('!' + rootPath + mainConfig.paths.src + path);
                     src.push('!' + rootPath + path);
                 });
             }
         }
 
         gutil.log('Src:', gutil.colors.magenta(src));
+		
+		return src;
+	}
+	
+    /**
+     * Set source paths
+     * @access private
+     * @param {Object} srcPaths
+     * @returns {*}
+     */
+    function setSrc(srcPaths) {
+
+        var src = prepareSrc(srcPaths)
 
         return gulp.src(src);
+    }
+	
+    /**
+     * Set browserify
+     * @access private
+     * @param {Object} srcPaths
+     * @param {Object} browserify
+     * @param {string} taskName
+     * @returns {*}
+     */
+	function setBrowserify(srcPaths, browserifyConfig, taskName) {
+		
+		var src = prepareSrc(srcPaths),
+            file = browserifyConfig.file || taskName + '.js',
+            entries = [];
+		
+		if(src.length) {
+
+            src.forEach(function(e) {
+                entries = entries.concat(glob.sync(e));
+            });
+
+            console.log(entries);
+
+				var b = browserify({
+					entries: entries,
+					debug: true
+				});
+
+			b = setTransforms(b, browserifyConfig.transform);
+			b = b.bundle();
+			b = b.pipe(source(file));
+			b = b.pipe(buffer());
+		}
+		
+		return b;
+	}
+	
+	/**
+     * Set browserify transforms
+     * @access private
+     * @param {Object} b
+     * @param {Array} transform
+     * @returns {*}
+     */
+	function setTransforms(b, transform) {
+
+        var transform = requireTransforms(transform);
+
+        if(transform.length) {
+
+            b = b.transform(transform);
+        }
+
+		return b;
+	}
+
+    /**
+     * Require transform modules
+     * @param transform
+     * @returns {Array}
+     */
+    function requireTransforms(transform) {
+
+        var transfoms = [];
+
+        if(Array.isArray(transform) && transform.length) {
+
+            transform.forEach(function(t) {
+
+                var trans = require(t);
+
+                if(trans) {
+                    transfoms.push(trans);
+                }
+            });
+        }
+
+        return transfoms;
     }
 
     /**
@@ -253,7 +351,6 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
 
             src.forEach(function (path, i, arr) {
 
-                //paths.push(rootPath + mainConfig.paths.src + path);
                 paths.push(rootPath + path);
             });
         }
@@ -375,7 +472,7 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
 
         if(Array.isArray(files) && files.length) {
 
-            files.forEach(function(file, i, arr) {
+            files.forEach(function(file) {
 
                 var config = getConfigFromFile(file);
                 configs.push(config);
@@ -480,7 +577,7 @@ var setConfigs = function setConfigs(configs) {
 
     if(Array.isArray(configs) && configs.length) {
 
-        configs.filter(function(config, i, arr) {
+        configs.filter(function(config) {
 
             if (!Object.keys(config).length) {
 
