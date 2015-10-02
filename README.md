@@ -120,7 +120,7 @@ var gulp = require('gulp'),
      *  Define tasks based on configs
      *  Run like normal gulp task 'gulp shared'
      */
-    gulpFromConfig.defineTasks(gulp, gulpPlugins);
+    gulpFromConfig.createTasks(gulp, gulpPlugins);
 ```
 > Example gulpfile.js
 
