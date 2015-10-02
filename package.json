@@ -1,6 +1,6 @@
 {
   "name": "gulp-from-config",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "Library that helps you to build app with gulp from config file",
   "main": "app.js",
   "scripts": {
@@ -22,13 +22,13 @@
   "homepage": "https://github.com/kystkysto/gulp-from-config",
   "license": "MIT",
   "dependencies": {
-    "gulp-util": "~3.0.6",
+    "gulp-util": "3.0.6",
     "gulp-jshint": "1.11.2",
-    "file-exists": "~0.1.1",
-    "glob": "~5.0.14",
-    "path": "~0.12.7",
-    "vinyl-buffer": "~1.0.0",
-    "vinyl-source-stream": "~1.1.0",
-    "browserify": "~11.2.0"
+    "file-exists": "0.1.1",
+    "glob": "5.0.14",
+    "path": "0.12.7",
+    "vinyl-buffer": "1.0.0",
+    "vinyl-source-stream": "1.1.0",
+    "browserify": "11.2.0"
   }
 }
