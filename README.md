@@ -6,18 +6,18 @@
 
 - Team work on the same project without risk of breaking other tasks
 - Store multiple typical tasks as configs
-- Write clean and specific to applicaion gulpfile
+- Write clear and specific to application gulpfile and keep routine tasks in configs
 
 ### Caveats
 
-- test coverage needed
+- tests and linter coverage needed
 
 ## Install
 
 ```bash
 # Don't forget to install gulp and if needed browserify globaly
 # $ sudo npm install -g gulp browserify
-$ npm install gulp gulp-load-plugins gulp-from-config
+$ npm install gulp gulp-from-config
 ```
 
 ## As simple as
@@ -33,23 +33,22 @@ Write tasks in JSON configs and place them in ./configs or any other folder
 
 ```javascript
 
-// Load gulp with plugins loader and gulp-from-config
+// Load gulp and gulp-from-config
 var gulp = require('gulp'),
-    gulpPlugins = require('gulp-load-plugins')(),
     gulpFromConfig = require('gulp-from-config');
 
     // Set config files path
     gulpFromConfig.setConfigsPath('configs');
 
     // Create tasks
-    gulpFromConfig.createTasks(gulp, gulpPlugins);
+    gulpFromConfig.createTasks(gulp);
 ```
 
-Run them as any other gulp tasks from console (task name):
+Run them as any other gulp tasks from console (by task name):
 
 ```bash
-# This command will search for dev task and run it
-$ gulp dev
+# This command will search for build task and run it
+$ gulp build
 ```
 
 ## Usage
@@ -60,11 +59,9 @@ $ gulp dev
 /**
  *  At the beginning load:
  *  - gulp
- *  - gulp-load-plugins
  *  - gulp-from-config
  */
 var gulp = require('gulp'),
-    gulpPlugins = require('gulp-load-plugins')(),
     gulpFromConfig = require('gulp-from-config');
 
     /**
@@ -82,7 +79,7 @@ var gulp = require('gulp'),
         name: "styles", // module task name
             subTasks: [
                 {
-                    name: "script", // technical task name
+                    name: "sass", // technical task name
                     dest: "/dest/css", // path to build
                     sourcemaps: true, // enable sourcemaps
                     src: {
@@ -95,32 +92,32 @@ var gulp = require('gulp'),
                     },
                     plugins: [
                         {
-                            "name": "sass", // gulp-sass plugin
+                            "name": "gulp-sass", // gulp-sass plugin
                             "options": {
-                                "outputStyle": "compressed" // wiil be passed to plugin parameter
+                                "outputStyle": "compressed" // will be passed to plugin parameter
                             }
                         }
                     ]
                 }
-            ]
+            ]Define tasks based on configs
     };
 
     gulpFromConfig.setConfigs([task]);
 
     /**
-     *  Callback function can to be triggered on completion of subtasks
-     *  Sub task config is passed to callback parameter
+     *  Callback function can be triggered on completion of subtasks
+     *  Sub task config is passed as parameter
      */
     var callback = function(config) {
-        console.log('Config:', config);
+        console.log('Sub task config:', config);
     }
     gulpFromConfig.setCallback(callback);
 
     /**
      *  Define tasks based on configs
-     *  Run like normal gulp task 'gulp shared'
+     *  Run like normal gulp task 'gulp styles'
      */
-    gulpFromConfig.createTasks(gulp, gulpPlugins);
+    gulpFromConfig.createTasks(gulp);
 ```
 > Example gulpfile.js
 
@@ -135,8 +132,8 @@ var gulp = require('gulp'),
             "dest": "/dest/js", // for gulp.dest('/dest/css')
             "sourcemaps": false, // if sourcemaps are required
             "browserify": {
-                "transform": ["ractivate"] // Set extra browserify transforms,
-                "file": // You can specify file name. Will be task name by defult ('production')
+                "transform": ["ractivate"] // Set extra browserify transforms
+                "file": // You can specify file name. Will be task name by default ('production')
             },
             "watch": [ // if array is empty will watch src files
                 "/src/js/*.js", // watch changes on source files
@@ -144,7 +141,7 @@ var gulp = require('gulp'),
             ],
             "src": {
                 "include": [
-                    "/src/js/*.js" // will be proceeded
+                    "/src/js/*.js" // will be processed
                 ],
                 "exclude": [
                     "/src/js/_*.js" // will be ignored
@@ -152,7 +149,7 @@ var gulp = require('gulp'),
             },
             "plugins": [
                 {
-                    "name": "uglify", // gulp-sass plugin
+                    "name": "gulp-uglify", // gulp-uglify plugin
                     "options": {
                         "mangle": false // will be passed into gulp.pipe(uglify(options))
                     }
@@ -176,6 +173,8 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 - **0.1.5** Task callback
 
 - **0.2.0** Added browserify support
+
+- **0.3.0** Removed gulp-load-plugins from dependency
 
 ## License
 

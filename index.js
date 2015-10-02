@@ -19,7 +19,7 @@ var rootPath = process.cwd(),
  * @param {Object} gulp - instanse of gulp
  * @param {Object} gulpPlugins - instance of gulp-load-plugins
  */
-var createTasks = function createTasks(gulp, gulpPlugins) {
+var createTasks = function createTasks(gulp) {
 
     var
     // Main config
@@ -29,8 +29,7 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
         configsPath = mainConfig ? mainConfig.paths.config : path.join(rootPath, 'configs'),
 
     // Gulp plugins
-        gulp = gulp,
-        gulpPlugins = gulpPlugins;
+        gulp = gulp;
 
     /**
      * Create gulp tasks
@@ -352,7 +351,7 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
 
         if(src instanceof Array) {
 
-            src.forEach(function (path, i, arr) {
+            src.forEach(function (path) {
 
                 paths.push(rootPath + path);
             });
@@ -397,16 +396,21 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
      */
     function setSourceMaps(task, sourcemaps, plugins, setPlugins) {
 
-        if (sourcemaps) {
+        var pipe = pluginExist('gulp-sourcemaps');
 
-            task = task.pipe(gulpPlugins.sourcemaps.init({loadMaps: true}));
-        }
+        if(pipe) {
 
-        task = setPlugins(task, plugins);
+            if (sourcemaps) {
 
-        if (sourcemaps) {
+                task = task.pipe(pipe.init({loadMaps: true}));
+            }
 
-            task = task.pipe(gulpPlugins.sourcemaps.write('./maps'));
+            task = setPlugins(task, plugins);
+
+            if (sourcemaps) {
+
+                task = task.pipe(pipe.write('./maps'));
+            }
         }
 
         return task;
@@ -421,13 +425,18 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
      */
     function setPlugins(task, plugins) {
 
-        plugins.forEach(function (plugin, i, arr) {
+        plugins.forEach(function (plugin) {
 
-            if(pluginExist(plugin)) task = task.pipe(gulpPlugins[plugin.name](plugin.options));
+            var pipe = pluginExist(plugin.name);
+
+            if(pipe) {
+                task = task.pipe(pipe(plugin.options));
+            }
         });
 
         return task;
     }
+
 
     /**
      * Check if plugin exists
@@ -435,21 +444,22 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
      * @param {Object} plugin
      * @returns {boolean}
      */
-    function pluginExist(plugin) {
+    function pluginExist(pluginName) {
 
-        if(!(gulpPlugins[plugin.name] instanceof Function)) {
-
-            gutil.log(gutil.colors.red('Error:'), 'Plugin does not exist', gutil.colors.green(plugin.name));
-            return false;
-        } else {
+        try {
+            var plugin = require(pluginName);
 
             gutil.log('Plugin:',
-                gutil.colors.green(plugin.name),
+                gutil.colors.green(pluginName),
                 'with options:',
                 plugin.options || gutil.colors.red('no options')
             );
 
-            return true;
+            return plugin;
+        } catch(err) {
+
+            gutil.log(gutil.colors.red('Error:'), 'Plugin', gutil.colors.green(pluginName), 'not found');
+            return false;
         }
     }
 

@@ -14,3 +14,8 @@
 ** 10, 2015**
 
 * Added browserify support
+
+## v0.3.0
+** 10, 2015**
+
+* Removed gulp-load-plugins from dependency
