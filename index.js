@@ -223,7 +223,7 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
             src.forEach(function(e) {
                 entries = entries.concat(glob.sync(e));
             });
-
+            
             var b = browserify({
                 entries: entries,
                 debug: true
@@ -234,7 +234,7 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
 			b = b.pipe(source(file));
 			b = b.pipe(buffer());
 		}
-		
+
 		return b;
 	}
 	
@@ -270,10 +270,14 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
 
             transform.forEach(function(t) {
 
-                var trans = require(t);
-
-                if(trans) {
+                try {
+                    var trans = require(t);
+                    gutil.log('Transform:',  gutil.colors.green(t));
                     transfoms.push(trans);
+                } catch (err) {
+                    if (err.code === 'MODULE_NOT_FOUND') {
+                        gutil.log(gutil.colors.red('Error:'), 'Transform does not exist', gutil.colors.green(t));
+                    }
                 }
             });
         }
@@ -435,11 +439,7 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
 
         if(!(gulpPlugins[plugin.name] instanceof Function)) {
 
-            throw new gutil.PluginError({
-                plugin: plugin.name,
-                message: 'Plugin does not exist'
-            });
-
+            gutil.log(gutil.colors.red('Error:'), 'Plugin does not exist', gutil.colors.green(plugin.name));
             return false;
         } else {
 
@@ -491,7 +491,7 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
 
         if(!fileExists(fileName)) {
 
-            gutil.log('Error:', gutil.colors.red('config file doesn\'t exist'));
+            gutil.log(gutil.colors.red('Error:'), 'config file doesn\'t exist');
         }
 
         return require(fileName);
@@ -580,7 +580,7 @@ var setConfigs = function setConfigs(configs) {
 
             if (!Object.keys(config).length) {
 
-                gutil.log('Error:', gutil.colors.red('wrong config format is passed'));
+                gutil.log(gutil.colors.red('Error:'), 'wrong config format is passed');
                 return false;
             }
 
@@ -593,7 +593,7 @@ var setConfigs = function setConfigs(configs) {
         return true;
     } else {
 
-        gutil.log('Error:', gutil.colors.red('must be array of configurations'));
+        gutil.log( gutil.colors.red('Error:'),'must be array of configurations');
         process.exit(1);
     }
 }
