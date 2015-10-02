@@ -422,7 +422,7 @@ var createTasks = function createTasks(gulp) {
 
         plugins.forEach(function (plugin) {
 
-            var pipe = pluginExist(plugin.name);
+            var pipe = pluginExist(plugin.name, plugin.options);
 
             if(pipe) {
                 task = task.pipe(pipe(plugin.options));
@@ -439,7 +439,7 @@ var createTasks = function createTasks(gulp) {
      * @param {Object} plugin
      * @returns {boolean}
      */
-    function pluginExist(pluginName) {
+    function pluginExist(pluginName, options) {
 
         try {
             var plugin = require(pluginName);
@@ -447,7 +447,7 @@ var createTasks = function createTasks(gulp) {
             gutil.log('Plugin:',
                 gutil.colors.green(pluginName),
                 'with options:',
-                plugin.options || gutil.colors.red('no options')
+                options || gutil.colors.red('no options')
             );
 
             return plugin;
