@@ -300,7 +300,7 @@ var createTasks = function createTasks(gulp) {
 
         gulp.task(subTaskWatch, function() {
 
-            gutil.log('Watching: ',  gutil.colors.magenta(watch));
+            gutil.log('Watching:', gutil.colors.magenta(watch));
 
             task = gulp.watch(watch, [subTaskName])
 
