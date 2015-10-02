@@ -1,5 +1,7 @@
 # gulp-from-config
 
+[![npm](https://nodei.co/npm/gulp-from-config.svg?downloads=true)](https://nodei.co/npm/gulp-from-config/)
+
 **`gulp-from-config`** provides ability to run gulp tasks from configs.
 
 ## Why
