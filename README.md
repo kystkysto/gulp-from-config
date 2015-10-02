@@ -18,7 +18,7 @@
 
 ```bash
 # Don't forget to install gulp globaly
-# $ sudo npm install -g gulp browserify
+# $ sudo npm install -g gulp
 $ npm install gulp gulp-from-config
 ```
 
