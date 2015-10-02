@@ -447,7 +447,7 @@ var createTasks = function createTasks(gulp) {
             gutil.log('Plugin:',
                 gutil.colors.green(pluginName),
                 'with options:',
-                options || gutil.colors.red('no options')
+                options || gutil.colors.yellow('no options')
             );
 
             return plugin;
