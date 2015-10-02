@@ -121,7 +121,7 @@ var gulp = require('gulp'),
      */
     gulpFromConfig.createTasks(gulp);
 ```
-> Example gulpfile.js
+> Example gulpfile.jsmake sure installing them
 
 ## config
 
@@ -134,7 +134,7 @@ var gulp = require('gulp'),
             "dest": "/dest/js", // for gulp.dest('/dest/css')
             "sourcemaps": false, // if sourcemaps are required
             "browserify": {
-                "transform": ["ractivate"] // Set extra browserify transforms
+                "transform": ["ractivate"] // Set extra browserify transforms (make sure that transform installed!)
                 "file": // You can specify file name. Will be task name by default ('production')
             },
             "watch": [ // if array is empty will watch src files
@@ -151,7 +151,7 @@ var gulp = require('gulp'),
             },
             "plugins": [
                 {
-                    "name": "gulp-uglify", // gulp-uglify plugin
+                    "name": "gulp-uglify", // gulp-uglify plugin (make sure that plugin installed!)
                     "options": {
                         "mangle": false // will be passed into gulp.pipe(uglify(options))
                     }
