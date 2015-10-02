@@ -20,26 +20,26 @@
 8 verbose parsed url   href: '.' }
 9 silly lockFile 3a52ce78- .
 10 verbose lock . /home/vagrant/.npm/3a52ce78-.lock
-11 verbose tar pack [ '/home/vagrant/.npm/gulp-from-config/0.1.5/package.tgz', '.' ]
-12 verbose tarball /home/vagrant/.npm/gulp-from-config/0.1.5/package.tgz
+11 verbose tar pack [ '/home/vagrant/.npm/gulp-from-config/0.3.0/package.tgz', '.' ]
+12 verbose tarball /home/vagrant/.npm/gulp-from-config/0.3.0/package.tgz
 13 verbose folder .
-14 info prepublish gulp-from-config@0.1.5
+14 info prepublish gulp-from-config@0.3.0
 15 silly lockFile 1f1177db-tar tar://.
 16 verbose lock tar://. /home/vagrant/.npm/1f1177db-tar.lock
-17 silly lockFile d99c0ec6-lp-from-config-0-1-5-package-tgz tar:///home/vagrant/.npm/gulp-from-config/0.1.5/package.tgz
-18 verbose lock tar:///home/vagrant/.npm/gulp-from-config/0.1.5/package.tgz /home/vagrant/.npm/d99c0ec6-lp-from-config-0-1-5-package-tgz.lock
+17 silly lockFile cd14b41f-lp-from-config-0-3-0-package-tgz tar:///home/vagrant/.npm/gulp-from-config/0.3.0/package.tgz
+18 verbose lock tar:///home/vagrant/.npm/gulp-from-config/0.3.0/package.tgz /home/vagrant/.npm/cd14b41f-lp-from-config-0-3-0-package-tgz.lock
 19 silly lockFile 1f1177db-tar tar://.
 20 silly lockFile 1f1177db-tar tar://.
-21 silly lockFile d99c0ec6-lp-from-config-0-1-5-package-tgz tar:///home/vagrant/.npm/gulp-from-config/0.1.5/package.tgz
-22 silly lockFile d99c0ec6-lp-from-config-0-1-5-package-tgz tar:///home/vagrant/.npm/gulp-from-config/0.1.5/package.tgz
-23 silly lockFile bf27709e-m-gulp-from-config-0-1-5-package /home/vagrant/.npm/gulp-from-config/0.1.5/package
-24 verbose lock /home/vagrant/.npm/gulp-from-config/0.1.5/package /home/vagrant/.npm/bf27709e-m-gulp-from-config-0-1-5-package.lock
-25 silly lockFile bf27709e-m-gulp-from-config-0-1-5-package /home/vagrant/.npm/gulp-from-config/0.1.5/package
-26 silly lockFile bf27709e-m-gulp-from-config-0-1-5-package /home/vagrant/.npm/gulp-from-config/0.1.5/package
+21 silly lockFile cd14b41f-lp-from-config-0-3-0-package-tgz tar:///home/vagrant/.npm/gulp-from-config/0.3.0/package.tgz
+22 silly lockFile cd14b41f-lp-from-config-0-3-0-package-tgz tar:///home/vagrant/.npm/gulp-from-config/0.3.0/package.tgz
+23 silly lockFile 63cd392b-m-gulp-from-config-0-3-0-package /home/vagrant/.npm/gulp-from-config/0.3.0/package
+24 verbose lock /home/vagrant/.npm/gulp-from-config/0.3.0/package /home/vagrant/.npm/63cd392b-m-gulp-from-config-0-3-0-package.lock
+25 silly lockFile 63cd392b-m-gulp-from-config-0-3-0-package /home/vagrant/.npm/gulp-from-config/0.3.0/package
+26 silly lockFile 63cd392b-m-gulp-from-config-0-3-0-package /home/vagrant/.npm/gulp-from-config/0.3.0/package
 27 silly lockFile 3a52ce78- .
 28 silly lockFile 3a52ce78- .
 29 silly publish { name: 'gulp-from-config',
-29 silly publish   version: '0.1.5',
+29 silly publish   version: '0.3.0',
 29 silly publish   description: 'Library that helps you to build app with gulp from config file',
 29 silly publish   main: 'app.js',
 29 silly publish   scripts: { test: 'node test.js' },
@@ -52,43 +52,43 @@
 29 silly publish   homepage: 'https://github.com/kystkysto/gulp-from-config',
 29 silly publish   license: 'MIT',
 29 silly publish   dependencies:
-29 silly publish    { 'gulp-util': '~3.0.6',
+29 silly publish    { 'gulp-util': '3.0.6',
 29 silly publish      'gulp-jshint': '1.11.2',
-29 silly publish      'file-exists': '~0.1.1',
-29 silly publish      glob: '~5.0.14',
-29 silly publish      path: '~0.12.7',
-29 silly publish      'vinyl-buffer': '~1.0.0',
-29 silly publish      'vinyl-source-stream': '~1.1.0',
-29 silly publish      browserify: '~11.2.0' },
-29 silly publish   readme: '# gulp-from-config\n\n**`gulp-from-config`** provides ability to run gulp tasks from configs.\n\n## Why\n\n- Team work on the same project without risk of breaking other tasks\n- Store multiple typical tasks as configs\n- Write clean and specific to applicaion gulpfile\n\n### Caveats\n\n- test coverage needed\n\n## Install\n\n```bash\n# Don\'t forget to install gulp and if needed browserify globaly\n# $ sudo npm install -g gulp browserify\n$ npm install gulp gulp-load-plugins gulp-from-config\n```\n\n## As simple as\n\nInstall plugins that you need:\n\n```bash\n# This command will install sass compiler for gulp\n$ npm install gulp-sass --save-dev\n```\n\nWrite tasks in JSON configs and place them in ./configs or any other folder\n\n```javascript\n\n// Load gulp with plugins loader and gulp-from-config\nvar gulp = require(\'gulp\'),\n    gulpPlugins = require(\'gulp-load-plugins\')(),\n    gulpFromConfig = require(\'gulp-from-config\');\n\n    // Set config files path\n    gulpFromConfig.setConfigsPath(\'configs\');\n\n    // Create tasks\n    gulpFromConfig.createTasks(gulp, gulpPlugins);\n```\n\nRun them as any other gulp tasks from console (task name):\n\n```bash\n# This command will search for dev task and run it\n$ gulp dev\n```\n\n## Usage\n\n```javascript\n\'use strict\';\n\n/**\n *  At the beginning load:\n *  - gulp\n *  - gulp-load-plugins\n *  - gulp-from-config\n */\nvar gulp = require(\'gulp\'),\n    gulpPlugins = require(\'gulp-load-plugins\')(),\n    gulpFromConfig = require(\'gulp-from-config\');\n\n    /**\n     *  First option is to get tasks from configs\n     *  and set path to files.\n     *\n     *  For example to ./configs directory\n     */\n    gulpFromConfig.setConfigsPath(\'configs\');\n\n    /**\n     *  Or set array of configs as parameter\n     */\n    var task = {\n        name: "styles", // module task name\n            subTasks: [\n                {\n                    name: "script", // technical task name\n                    dest: "/dest/css", // path to build\n                    sourcemaps: true, // enable sourcemaps\n                    src: {\n                        include: [\n                            "/src/sass/*.sass" // files to proceed\n                        ],\n                        exclude: [\n                            "/src/sass/_*.sass" // files to ignore\n                        ]\n                    },\n                    plugins: [\n                        {\n                            "name": "sass", // gulp-sass plugin\n                            "options": {\n                                "outputStyle": "compressed" // wiil be passed to plugin parameter\n                            }\n                        }\n                    ]\n                }\n            ]\n    };\n\n    gulpFromConfig.setConfigs([task]);\n\n    /**\n     *  Callback function can to be triggered on completion of subtasks\n     *  Sub task config is passed to callback parameter\n     */\n    var callback = function(config) {\n        console.log(\'Config:\', config);\n    }\n    gulpFromConfig.setCallback(callback);\n\n    /**\n     *  Define tasks based on configs\n     *  Run like normal gulp task \'gulp shared\'\n     */\n    gulpFromConfig.defineTasks(gulp, gulpPlugins);\n```\n> Example gulpfile.js\n\n## config\n\n```javascript\n{\n    "name": "production", // task name which can be called by \'gulp production\'\n    "subTasks": [\n        {\n            "name": "script", // sub task name\n            "dest": "/dest/js", // for gulp.dest(\'/dest/css\')\n            "sourcemaps": false, // if sourcemaps are required\n            "browserify": {\n                "transform": ["ractivate"] // Set extra browserify transforms,\n                "file": // You can specify file name. Will be task name by defult (\'production\')\n            },\n            "watch": [ // if array is empty will watch src files\n                "/src/js/*.js", // watch changes on source files\n                "/src/js/_*.js"\n            ],\n            "src": {\n                "include": [\n                    "/src/js/*.js" // will be proceeded\n                ],\n                "exclude": [\n                    "/src/js/_*.js" // will be ignored\n                ]\n            },\n            "plugins": [\n                {\n                    "name": "uglify", // gulp-sass plugin\n                    "options": {\n                        "mangle": false // will be passed into gulp.pipe(uglify(options))\n                    }\n                }\n            ]\n        }\n        }\n    ]\n};\n```\n> Example production.json\n\n## Contributing\n\nIn lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [gulp](http://gulpjs.com/).\n\n## Release History\n\n- **0.1.0** Initial release\n\n- **0.1.5** Task callback\n\n- **0.2.0** Added browserify support\n\n## License\n\nCopyright (c) 2015 Efim Solovyev. Licensed under the MIT license.',
+29 silly publish      'file-exists': '0.1.1',
+29 silly publish      glob: '5.0.14',
+29 silly publish      path: '0.12.7',
+29 silly publish      'vinyl-buffer': '1.0.0',
+29 silly publish      'vinyl-source-stream': '1.1.0',
+29 silly publish      browserify: '11.2.0' },
+29 silly publish   readme: '# gulp-from-config\n\n[![npm](https://nodei.co/npm/gulp-from-config.svg?downloads=true)](https://nodei.co/npm/gulp-from-config/)\n\n**`gulp-from-config`** provides ability to run gulp tasks from configs.\n\n## Why\n\n- Team work on the same project without risk of breaking other tasks\n- Store multiple typical tasks as configs\n- Write clear and specific to application gulpfile and keep routine tasks in configs\n\n### Caveats\n\n- tests and linter coverage needed\n\n## Install\n\n```bash\n# Don\'t forget to install gulp and if needed browserify globaly\n# $ sudo npm install -g gulp browserify\n$ npm install gulp gulp-from-config\n```\n\n## As simple as\n\nInstall plugins that you need:\n\n```bash\n# This command will install sass compiler for gulp\n$ npm install gulp-sass --save-dev\n```\n\nWrite tasks in JSON configs and place them in ./configs or any other folder\n\n```javascript\n\n// Load gulp and gulp-from-config\nvar gulp = require(\'gulp\'),\n    gulpFromConfig = require(\'gulp-from-config\');\n\n    // Set config files path\n    gulpFromConfig.setConfigsPath(\'configs\');\n\n    // Create tasks\n    gulpFromConfig.createTasks(gulp);\n```\n\nRun them as any other gulp tasks from console (by task name):\n\n```bash\n# This command will search for build task and run it\n$ gulp build\n```\n\n## Usage\n\n```javascript\n\'use strict\';\n\n/**\n *  At the beginning load:\n *  - gulp\n *  - gulp-from-config\n */\nvar gulp = require(\'gulp\'),\n    gulpFromConfig = require(\'gulp-from-config\');\n\n    /**\n     *  First option is to get tasks from configs\n     *  and set path to files.\n     *\n     *  For example to ./configs directory\n     */\n    gulpFromConfig.setConfigsPath(\'configs\');\n\n    /**\n     *  Or set array of configs as parameter\n     */\n    var task = {\n        name: "styles", // module task name\n            subTasks: [\n                {\n                    name: "sass", // technical task name\n                    dest: "/dest/css", // path to build\n                    sourcemaps: true, // enable sourcemaps\n                    src: {\n                        include: [\n                            "/src/sass/*.sass" // files to proceed\n                        ],\n                        exclude: [\n                            "/src/sass/_*.sass" // files to ignore\n                        ]\n                    },\n                    plugins: [\n                        {\n                            "name": "gulp-sass", // gulp-sass plugin\n                            "options": {\n                                "outputStyle": "compressed" // will be passed to plugin parameter\n                            }\n                        }\n                    ]\n                }\n            ]Define tasks based on configs\n    };\n\n    gulpFromConfig.setConfigs([task]);\n\n    /**\n     *  Callback function can be triggered on completion of subtasks\n     *  Sub task config is passed as parameter\n     */\n    var callback = function(config) {\n        console.log(\'Sub task config:\', config);\n    }\n    gulpFromConfig.setCallback(callback);\n\n    /**\n     *  Define tasks based on configs\n     *  Run like normal gulp task \'gulp styles\'\n     */\n    gulpFromConfig.createTasks(gulp);\n```\n> Example gulpfile.jsmake sure installing them\n\n## config\n\n```javascript\n{\n    "name": "production", // task name which can be called by \'gulp production\'\n    "subTasks": [\n        {\n            "name": "script", // sub task name\n            "dest": "/dest/js", // for gulp.dest(\'/dest/css\')\n            "sourcemaps": false, // if sourcemaps are required\n            "browserify": {\n                "transform": ["ractivate"] // Set extra browserify transforms (make sure that transform installed!)\n                "file": // You can specify file name. Will be task name by default (\'production\')\n            },\n            "watch": [ // if array is empty will watch src files\n                "/src/js/*.js", // watch changes on source files\n                "/src/js/_*.js"\n            ],\n            "src": {\n                "include": [\n                    "/src/js/*.js" // will be processed\n                ],\n                "exclude": [\n                    "/src/js/_*.js" // will be ignored\n                ]\n            },\n            "plugins": [\n                {\n                    "name": "gulp-uglify", // gulp-uglify plugin (make sure that plugin installed!)\n                    "options": {\n                        "mangle": false // will be passed into gulp.pipe(uglify(options))\n                    }\n                }\n            ]\n        }\n        }\n    ]\n};\n```\n> Example production.json\n\n## Contributing\n\nIn lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [gulp](http://gulpjs.com/).\n\n## Release History\n\n- **0.1.0** Initial release\n\n- **0.1.5** Task callback\n\n- **0.2.0** Added browserify support\n\n- **0.3.0** Removed gulp-load-plugins from dependency\n\n## License\n\nCopyright (c) 2015 Efim Solovyev. Licensed under the MIT license.',
 29 silly publish   readmeFilename: 'README.md',
-29 silly publish   gitHead: '891aa200e5f8cc437cf48250f7afc27b8fdcc6af',
-29 silly publish   _id: 'gulp-from-config@0.1.5',
-29 silly publish   _shasum: '4a32c54e65a50d73974eea3e4d42a608aa6b77c9',
+29 silly publish   gitHead: '307b6e5234e08aac6b67548611188bbcc34e5e45',
+29 silly publish   _id: 'gulp-from-config@0.3.0',
+29 silly publish   _shasum: '503ad1f1931712b4f4466e594b3bebc031e17155',
 29 silly publish   _from: '.' }
 30 verbose request where is /gulp-from-config
 31 verbose request registry https://registry.npmjs.org/
-32 verbose request id 975f6f9808cae750
+32 verbose request id b476a94c2d82b32b
 33 verbose url raw /gulp-from-config
 34 verbose url resolving [ 'https://registry.npmjs.org/', './gulp-from-config' ]
 35 verbose url resolved https://registry.npmjs.org/gulp-from-config
 36 verbose request where is https://registry.npmjs.org/gulp-from-config
-37 info trying registry request attempt 1 at 08:24:52
+37 info trying registry request attempt 1 at 12:35:53
 38 http PUT https://registry.npmjs.org/gulp-from-config
 39 http 403 https://registry.npmjs.org/gulp-from-config
 40 verbose headers { 'content-type': 'application/json',
 40 verbose headers   'cache-control': 'max-age=60',
 40 verbose headers   'content-length': '95',
 40 verbose headers   'accept-ranges': 'bytes',
-40 verbose headers   date: 'Fri, 02 Oct 2015 08:24:55 GMT',
+40 verbose headers   date: 'Fri, 02 Oct 2015 12:35:58 GMT',
 40 verbose headers   via: '1.1 varnish',
 40 verbose headers   connection: 'keep-alive',
-40 verbose headers   'x-served-by': 'cache-fra1237-FRA',
+40 verbose headers   'x-served-by': 'cache-ams4147-AMS',
 40 verbose headers   'x-cache': 'MISS',
 40 verbose headers   'x-cache-hits': '0',
-40 verbose headers   'x-timer': 'S1443774294.418227,VS0,VE1529' }
+40 verbose headers   'x-timer': 'S1443789356.709834,VS0,VE1557' }
 41 error publish Failed PUT 403
-42 error Error: "You cannot publish over the previously published version 0.1.5." : gulp-from-config
+42 error Error: "You cannot publish over the previously published version 0.3.0." : gulp-from-config
 42 error     at RegClient.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:308:14)
 42 error     at Request._callback (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:246:65)
 42 error     at Request.self.callback (/usr/local/lib/node_modules/npm/node_modules/request/request.js:236:22)
