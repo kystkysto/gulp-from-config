@@ -8,7 +8,7 @@
 - Store multiple typical tasks as configs
 - Write clean and specific to applicaion gulpfile
 
-### Caveates
+### Caveats
 
 - test coverage needed
 

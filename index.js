@@ -223,7 +223,7 @@ var createTasks = function createTasks(gulp, gulpPlugins) {
             src.forEach(function(e) {
                 entries = entries.concat(glob.sync(e));
             });
-            
+
             var b = browserify({
                 entries: entries,
                 debug: true
