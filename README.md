@@ -79,7 +79,7 @@ var gulp = require('gulp'),
      */
     var task = {
         name: "styles", // module task name
-            subTasks: [
+            subTasks: [ // define tasks based on configs
                 {
                     name: "sass", // technical task name
                     dest: "/dest/css", // path to build
@@ -101,7 +101,7 @@ var gulp = require('gulp'),
                         }
                     ]
                 }
-            ]Define tasks based on configs
+            ]
     };
 
     gulpFromConfig.setConfigs([task]);
@@ -135,7 +135,7 @@ var gulp = require('gulp'),
             "sourcemaps": false, // if sourcemaps are required
             "browserify": {
                 "transform": ["ractivate"] // Set extra browserify transforms (make sure that transform installed!)
-                "file": // You can specify file name. Will be task name by default ('production')
+                "file": "prod.js" // You can specify file name. Will be task name by default ('production')
             },
             "watch": [ // if array is empty will watch src files
                 "/src/js/*.js", // watch changes on source files
