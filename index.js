@@ -396,15 +396,19 @@ var createTasks = function createTasks(gulp) {
      */
     function setSourceMaps(task, sourcemaps, plugins, setPlugins) {
 
-        var pipe = pluginExist('gulp-sourcemaps');
+        var pipe = null;
 
-        if(sourcemaps && pipe) {
+        if(sourcemaps) {
+            pipe = pluginExist('gulp-sourcemaps');
+        }
+
+        if(pipe) {
             task = task.pipe(pipe.init({loadMaps: true}));
         }
 
         task = setPlugins(task, plugins);
 
-        if(sourcemaps && pipe) {
+        if(pipe) {
             task = task.pipe(pipe.write('./maps'));
         }
 
