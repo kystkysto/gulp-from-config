@@ -1,4 +1,4 @@
-# Gulp From Config Changelog
+# gulp-from-config
 
 ## v0.1.0
 ** 09, 2015**

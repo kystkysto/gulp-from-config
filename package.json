@@ -1,8 +1,8 @@
 {
   "name": "gulp-from-config",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Library that helps you to build app with gulp from config file",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
     "test": "node test.js"
   },
@@ -15,7 +15,7 @@
     "config",
     "gulpfriendly"
   ],
-  "author": "Efim Solovyev",
+  "author": "kystkysto",
   "bugs": {
     "url": "https://github.com/kystkysto/gulp-from-config/issues"
   },

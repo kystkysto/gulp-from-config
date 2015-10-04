@@ -64,7 +64,8 @@ $ gulp build
  *  - gulp-from-config
  */
 var gulp = require('gulp'),
-    gulpFromConfig = require('gulp-from-config');
+    gulpFromConfig = require('gulp-from-config')
+    tasks = []; // declare tasks list array
 
     /**
      *  First option is to get tasks from configs
@@ -119,7 +120,16 @@ var gulp = require('gulp'),
      *  Define tasks based on configs
      *  Run like normal gulp task 'gulp styles'
      */
-    gulpFromConfig.createTasks(gulp);
+    tasks = gulpFromConfig.createTasks(gulp, gulpPlugins);
+
+    /**
+     *  Or if you need to run all of them
+     *  pass tasks array to default task
+     *  and run 'gulp'
+     */
+    gulp.task('default', tasks, function() {
+        console.log('All tasks are done!');
+    });
 ```
 > Example gulpfile.jsmake sure installing them
 
@@ -180,4 +190,4 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## License
 
-Copyright (c) 2015 Efim Solovyev. Licensed under the MIT license.
+Copyright (c) 2015 kystkysto. Licensed under the MIT license.

@@ -1,61 +1,70 @@
 /**
  * gulp-from-config
- * @author Efim Solovyev
- * @copyright Efim Solovyev 2015
+ * @author kystkysto
+ * @copyright kystkysto 2015
  */
 
 // Root path
 var rootPath = process.cwd(),
+
+// Npm modules
     path = require('path'),
     glob = require('glob'),
-    fileExists = require('file-exists'),
-    gutil = require('gulp-util'),
 	browserify = require('browserify'),
+    fileExists = require('file-exists'),
     source = require('vinyl-source-stream'),
-    buffer = require('vinyl-buffer');
+    buffer = require('vinyl-buffer'),
+
+// Gulp plugins
+    gutil = require('gulp-util');
 
 /**
+ * Define and return tasks
  * @access public
  * @param {Object} gulp - instanse of gulp
  * @param {Object} gulpPlugins - instance of gulp-load-plugins
+ * @returns {Array} tasks
  */
-var createTasks = function createTasks(gulp) {
+var createTasks = function createTasks(gulpInstance) {
 
-    var
+    // Gulp
+    var gulp = gulpInstance,
+
     // Main config
         mainConfig = this.__config,
 
     // Path og config files
-        configsPath = mainConfig ? mainConfig.paths.config : path.join(rootPath, 'configs'),
-
-    // Gulp plugins
-        gulp = gulp;
+        configsPath = mainConfig ? mainConfig.paths.config : path.join(rootPath, 'configs');
 
     /**
      * Create gulp tasks
      * @access private
-     * @returns {boolean}
+     * @returns {Array} tasks
      */
-    function createTasks() {
+    function addTasks() {
 
         var configs = getConfigs.call(this),
+            tasks = [],
             subTasks;
 
         configs.forEach(function (config) {
 
-            if(config.name) {
+            var taskName = config.name;
+
+            if(taskName) {
+
                 subTasks = createTask.call(this, config);
 
-                gulp.task(config.name, subTasks, function(){
+                gulp.task(taskName, subTasks, function(){});
 
+                tasks.push(taskName);
 
-                });
             } else {
                 gutil.log(gutil.colors.red('Error:'), 'task name must be set');
             }
         }.bind(this));
 
-        return true;
+        return tasks;
     }
 
     /**
@@ -110,10 +119,10 @@ var createTasks = function createTasks(gulp) {
      */
     function isSubTaskValid(task) {
 
-        if (Object.keys(task.src).length
-            && Array.isArray(task.src.include)
-            && task.src.include.length
-            && typeof(task.dest) === 'string') {
+        if (Object.keys(task.src).length &&
+            Array.isArray(task.src.include) &&
+            task.src.include.length &&
+            typeof(task.dest) === 'string') {
 
             return true;
         } else {
@@ -142,7 +151,7 @@ var createTasks = function createTasks(gulp) {
                 dest = rootPath + subTask.dest;
 
                 if(subTask.browserify) {
-                    task = setBrowserify(subTask.src, subTask.browserify, taskName)
+                    task = setBrowserify(subTask.src, subTask.browserify, taskName);
                 } else {
                     task = setSrc(subTask.src);
                 }
@@ -183,10 +192,23 @@ var createTasks = function createTasks(gulp) {
             }
         }
 
-        gutil.log('Src:', gutil.colors.magenta(src));
+        src.forEach(function(srcPath, i) {
+            srcPath = minimizePath(srcPath);
+            gutil.log('Src path' + i + ':', gutil.colors.magenta(srcPath));
+        });
 		
 		return src;
 	}
+
+    /**
+     * Cut rootPath from path
+     * @access private
+     * @param {string} path
+     * @returns {string} path
+     */
+    function minimizePath(path) {
+        return path.replace(rootPath, '.');
+    }
 	
     /**
      * Set source paths
@@ -196,7 +218,7 @@ var createTasks = function createTasks(gulp) {
      */
     function setSrc(srcPaths) {
 
-        var src = prepareSrc(srcPaths)
+        var src = prepareSrc(srcPaths);
 
         return gulp.src(src);
     }
@@ -213,7 +235,8 @@ var createTasks = function createTasks(gulp) {
 		
 		var src = prepareSrc(srcPaths),
             file = browserifyConfig.file || taskName + '.js',
-            entries = [];
+            entries = [],
+            b = null;
 		
 		if(src.length) {
 
@@ -223,7 +246,7 @@ var createTasks = function createTasks(gulp) {
                 entries = entries.concat(glob.sync(e));
             });
 
-            var b = browserify({
+            b = browserify({
                 entries: entries,
                 debug: true
             });
@@ -244,9 +267,9 @@ var createTasks = function createTasks(gulp) {
      * @param {Array} transform
      * @returns {*}
      */
-	function setTransforms(b, transform) {
+	function setTransforms(b, transforms) {
 
-        var transform = requireTransforms(transform);
+        var transform = requireTransforms(transforms);
 
         if(transform.length) {
 
@@ -300,7 +323,10 @@ var createTasks = function createTasks(gulp) {
 
         gulp.task(subTaskWatch, function() {
 
-            gutil.log('Watching:', gutil.colors.magenta(watch));
+            watch.forEach(function(watchPath, i) {
+                watchPath = minimizePath(watchPath);
+                gutil.log('Watching path' + i + ':', gutil.colors.magenta(watchPath));
+            });
 
             task = gulp.watch(watch, [subTaskName])
 
@@ -527,9 +553,8 @@ var createTasks = function createTasks(gulp) {
         return Math.random().toString(36).substring(7);
     }
 
-
-    createTasks.call(this);
-}
+    return addTasks.call(this);
+};
 
 /**
  * Set configs path
@@ -546,9 +571,9 @@ var setConfigsPath = function setConfigsPath(configsPath) {
         paths: {
             config: path.join(rootPath, configsPath)
         }
-    }
+    };
     return true;
-}
+};
 
 /**
  * Set task configs
@@ -602,10 +627,10 @@ var setConfigs = function setConfigs(configs) {
         return true;
     } else {
 
-        gutil.log( gutil.colors.red('Error:'),'must be array of configurations');
+        gutil.log(gutil.colors.red('Error:'),'must be array of configurations');
         process.exit(1);
     }
-}
+};
 
 /**
  * Set callback which called on task completion
@@ -618,14 +643,12 @@ var setCallback = function setCallback(callback) {
     } else {
         gutil.log(gutil.colors.yellow('Warning:'), 'taskCompletion is not a function');
     }
-}
+};
 
 module.exports = {
     __config: null,
     __configs: [],
     __taskCompletion: function(config) {
-
-        gutil.log('Task done:', gutil.colors.cyan(config.name));
     },
     setCallback: setCallback,
     setConfigs: setConfigs,
