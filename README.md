@@ -76,11 +76,11 @@ var gulp = require('gulp'),
     gulpFromConfig.setConfigsPath('configs');
 
     /**
-     *  Or set array of configs as parameter
+     *  Or define config
      */
     var task = {
         name: "styles", // module task name
-            subTasks: [ // define tasks based on configs
+            subTasks: [
                 {
                     name: "sass", // technical task name
                     dest: "/dest/css", // path to build
@@ -105,6 +105,9 @@ var gulp = require('gulp'),
             ]
     };
 
+    /**
+     *  And pass it as Array to setConfigs function
+     */
     gulpFromConfig.setConfigs([task]);
 
     /**
