@@ -123,7 +123,7 @@ var gulp = require('gulp'),
      *  Define tasks based on configs
      *  Run like normal gulp task 'gulp styles'
      */
-    tasks = gulpFromConfig.createTasks(gulp, gulpPlugins);
+    tasks = gulpFromConfig.createTasks(gulp);
 
     /**
      *  Or if you need to run all of them
