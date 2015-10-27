@@ -22,13 +22,14 @@
   "homepage": "https://github.com/kystkysto/gulp-from-config",
   "license": "MIT",
   "dependencies": {
-    "gulp-util": "3.0.6",
-    "gulp-jshint": "1.11.2",
+    "browserify": "11.2.0",
     "file-exists": "0.1.1",
     "glob": "5.0.14",
+    "gulp-jshint": "1.11.2",
+    "gulp-util": "3.0.6",
     "path": "0.12.7",
     "vinyl-buffer": "1.0.0",
     "vinyl-source-stream": "1.1.0",
-    "browserify": "11.2.0"
+    "watchify": "^3.5.0"
   }
 }

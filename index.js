@@ -11,6 +11,7 @@ var rootPath = process.cwd(),
     path = require('path'),
     glob = require('glob'),
 	browserify = require('browserify'),
+    watchify = require('watchify'),
     fileExists = require('file-exists'),
     source = require('vinyl-source-stream'),
     buffer = require('vinyl-buffer'),
@@ -246,11 +247,12 @@ var createTasks = function createTasks(gulpInstance) {
                 entries = entries.concat(glob.sync(e));
             });
 
-            b = browserify({
+            b = watchify(browserify({
                 entries: entries,
                 debug: true
-            });
+            }));
 
+            b = b.on('error', gutil.log.bind(gutil, gutil.colors.red('Error:'),'Browserify Error'));
 			b = setTransforms(b, browserifyConfig.transform);
 			b = b.bundle();
 			b = b.pipe(source(file));
