@@ -252,11 +252,16 @@ var createTasks = function createTasks(gulpInstance) {
                 debug: true
             }));
 
+            b.on('update', function() {
+
+                gulp.start(taskName);
+                console.log('updated');
+            });
             b = b.on('error', gutil.log.bind(gutil, gutil.colors.red('Error:'),'Browserify Error'));
-			b = setTransforms(b, browserifyConfig.transform);
-			b = b.bundle();
-			b = b.pipe(source(file));
-			b = b.pipe(buffer());
+            b = setTransforms(b, browserifyConfig.transform);
+            b = b.bundle();
+            b = b.pipe(source(file));
+            b = b.pipe(buffer());
 		}
 
 		return b;
@@ -355,12 +360,15 @@ var createTasks = function createTasks(gulpInstance) {
         if(Array.isArray(subTask.watch) && subTask.watch.length) {
 
             watch = watch.concat(setFullPaths(subTask.watch));
-        } else {
+        } else if(subTask.watch === true) {
 
             include = setFullPaths(subTask.src.include);
             exclude = setFullPaths(subTask.src.exclude);
 
             watch = watch.concat(include, exclude);
+        } else {
+
+            
         }
 
         return watch;
