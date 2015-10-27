@@ -249,17 +249,19 @@ var createTasks = function createTasks(gulpInstance) {
                 entries = entries.concat(glob.sync(e));
             });
 
-            b = watchify(browserify({
-                entries: entries,
-                debug: true
-            }));
+            var opt = {
+                    entries: entries,
+                    debug: true
+                };
+
+            b = subTask.browserify.watchify ? watchify(browserify(opt)) : browserify(opt);
 
             b = b.on('error', gutil.log.bind(gutil, gutil.colors.red('Error:'),'Browserify Error'));
             b = setTransforms(b, subTask.browserify.transform);
-            b.on('update', function() {
-                
+            b.on('update', function(file) {
+                gutil.log('File: ' + gutil.colors.magenta(file) + ' was ' + gutil.colors.green('changed'));
                 var taskName = randomTaskName();
-                subTask.browserify = false;
+                subTask.browserify.watchify = false;
 
                 createSubTask.call(this, taskName, subTask, taskName);
 
