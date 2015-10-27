@@ -152,7 +152,7 @@ var createTasks = function createTasks(gulpInstance) {
                 dest = rootPath + subTask.dest;
 
                 if(subTask.browserify) {
-                    task = setBrowserify(subTask.src, subTask.browserify, taskName);
+                    task = setBrowserify(subTask.src, subTask, taskName);
                 } else {
                     task = setSrc(subTask.src);
                 }
@@ -161,7 +161,9 @@ var createTasks = function createTasks(gulpInstance) {
 
             task = task.pipe(gulp.dest(dest));
 
-            taskCompletion(subTask);
+            if(taskCompletion) {
+                taskCompletion(subTask);
+            }
 
             return task;
         }.bind(this, taskCompletion));
@@ -232,10 +234,10 @@ var createTasks = function createTasks(gulpInstance) {
      * @param {string} taskName
      * @returns {*}
      */
-	function setBrowserify(srcPaths, browserifyConfig, taskName) {
+	function setBrowserify(srcPaths, subTask, taskName) {
 		
 		var src = prepareSrc(srcPaths),
-            file = browserifyConfig.file || taskName + '.js',
+            file = subTask.browserify.file || taskName + '.js',
             entries = [],
             b = null;
 		
@@ -252,13 +254,17 @@ var createTasks = function createTasks(gulpInstance) {
                 debug: true
             }));
 
+            b = b.on('error', gutil.log.bind(gutil, gutil.colors.red('Error:'),'Browserify Error'));
+            b = setTransforms(b, subTask.browserify.transform);
             b.on('update', function() {
+                
+                var taskName = randomTaskName();
+                subTask.browserify = false;
+
+                createSubTask.call(this, taskName, subTask, taskName);
 
                 gulp.start(taskName);
-                console.log('updated');
-            });
-            b = b.on('error', gutil.log.bind(gutil, gutil.colors.red('Error:'),'Browserify Error'));
-            b = setTransforms(b, browserifyConfig.transform);
+            }.bind(this));
             b = b.bundle();
             b = b.pipe(source(file));
             b = b.pipe(buffer());
