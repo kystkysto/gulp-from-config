@@ -10,7 +10,7 @@ var rootPath = process.cwd(),
 // Npm modules
     path = require('path'),
     glob = require('glob'),
-	browserify = require('browserify'),
+    browserify = require('browserify'),
     watchify = require('watchify'),
     fileExists = require('file-exists'),
     source = require('vinyl-source-stream'),
@@ -152,14 +152,16 @@ var createTasks = function createTasks(gulpInstance) {
                 dest = rootPath + subTask.dest;
 
                 if(subTask.browserify) {
-                    task = setBrowserify(subTask.src, subTask, taskName);
+                    task = setBrowserify(subTask.src, subTask, taskName, dest);
+                    task = runWatchifyTask(subTask, taskName, task, dest);
                 } else {
                     task = setSrc(subTask.src);
+
+                    task = setPipes(task, subTask.plugins, subTask.sourcemaps);
+
+                    task = task.pipe(gulp.dest(dest));
                 }
 
-            task = setPipes(task, subTask.plugins, subTask.sourcemaps);
-
-            task = task.pipe(gulp.dest(dest));
 
             if(taskCompletion) {
                 taskCompletion(subTask);
@@ -169,14 +171,14 @@ var createTasks = function createTasks(gulpInstance) {
         }.bind(this, taskCompletion));
     }
 
-	/**
+    /**
      * Prepare source patshs
      * @access private
      * @param {Object} srcPaths
      * @returns Array
-	 */
-	function prepareSrc(srcPaths) {
-		
+     */
+    function prepareSrc(srcPaths) {
+        
         var src = [],
             include = [];
 
@@ -199,9 +201,9 @@ var createTasks = function createTasks(gulpInstance) {
             srcPath = minimizePath(srcPath);
             gutil.log('Src path' + i + ':', gutil.colors.magenta(srcPath));
         });
-		
-		return src;
-	}
+        
+        return src;
+    }
 
     /**
      * Cut rootPath from path
@@ -212,7 +214,7 @@ var createTasks = function createTasks(gulpInstance) {
     function minimizePath(path) {
         return path.replace(rootPath, '.');
     }
-	
+    
     /**
      * Set source paths
      * @access private
@@ -225,7 +227,7 @@ var createTasks = function createTasks(gulpInstance) {
 
         return gulp.src(src);
     }
-	
+    
     /**
      * Set browserify
      * @access private
@@ -234,14 +236,13 @@ var createTasks = function createTasks(gulpInstance) {
      * @param {string} taskName
      * @returns {*}
      */
-	function setBrowserify(srcPaths, subTask, taskName) {
-		
-		var src = prepareSrc(srcPaths),
-            file = subTask.browserify.file || taskName + '.js',
+    function setBrowserify(srcPaths, subTask, taskName, dest) {
+        
+        var src = prepareSrc(srcPaths),
             entries = [],
             b = null;
-		
-		if(src.length) {
+        
+        if(src.length) {
 
             gutil.log('Browserify enabled:', gutil.colors.blue(true));
 
@@ -255,34 +256,43 @@ var createTasks = function createTasks(gulpInstance) {
                 };
 
             b = subTask.browserify.watchify ? watchify(browserify(opt)) : browserify(opt);
-
-            b = b.on('error', gutil.log.bind(gutil, gutil.colors.red('Error:'),'Browserify Error'));
             b = setTransforms(b, subTask.browserify.transform);
             b.on('update', function(file) {
+
                 gutil.log('File: ' + gutil.colors.magenta(file) + ' was ' + gutil.colors.green('changed'));
-                var taskName = randomTaskName();
-                subTask.browserify.watchify = false;
+                return runWatchifyTask(subTask, taskName, b, dest);
+                
+           }.bind(this));
+        }
 
-                createSubTask.call(this, taskName, subTask, taskName);
+        return b;
+    }
 
-                gulp.start(taskName);
-            }.bind(this));
-            b = b.bundle();
-            b = b.pipe(source(file));
-            b = b.pipe(buffer());
-		}
+    function runWatchifyTask(subTask, taskName, b, dest) {
 
-		return b;
-	}
-	
-	/**
+        var file = subTask.browserify.file || taskName + '.js';
+
+        b = b.on('error', gutil.log.bind(gutil, gutil.colors.red('Error:'),'Browserify Error'));
+        
+        b = b.bundle();
+        b = b.pipe(source(file));
+        b = b.pipe(buffer());
+
+        b = setPipes(b, subTask.plugins, subTask.sourcemaps);
+
+        b = b.pipe(gulp.dest(dest));
+
+        return b;
+    }
+    
+    /**
      * Set browserify transforms
      * @access private
      * @param {Object} b
      * @param {Array} transform
      * @returns {*}
      */
-	function setTransforms(b, transforms) {
+    function setTransforms(b, transforms) {
 
         var transform = requireTransforms(transforms);
 
@@ -291,8 +301,8 @@ var createTasks = function createTasks(gulpInstance) {
             b = b.transform(transform);
         }
 
-		return b;
-	}
+        return b;
+    }
 
     /**
      * Require transform modules
