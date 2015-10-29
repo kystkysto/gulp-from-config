@@ -262,7 +262,8 @@ var createTasks = function createTasks(gulpInstance) {
                 gutil.log('File: ' + gutil.colors.magenta(file) + ' was ' + gutil.colors.green('changed'));
                 return runWatchifyTask(subTask, taskName, b, dest);
                 
-           }.bind(this));
+            }.bind(this));
+            b = b.on('error', gutil.log.bind(gutil, gutil.colors.red('Error:'),'Browserify Error'));
         }
 
         return b;
@@ -271,8 +272,6 @@ var createTasks = function createTasks(gulpInstance) {
     function runWatchifyTask(subTask, taskName, b, dest) {
 
         var file = subTask.browserify.file || taskName + '.js';
-
-        b = b.on('error', gutil.log.bind(gutil, gutil.colors.red('Error:'),'Browserify Error'));
         
         b = b.bundle();
         b = b.pipe(source(file));
