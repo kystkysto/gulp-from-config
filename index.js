@@ -151,16 +151,16 @@ var createTasks = function createTasks(gulpInstance) {
             var task = {},
                 dest = rootPath + subTask.dest;
 
-                if(subTask.browserify) {
-                    task = setBrowserify(subTask.src, subTask, taskName, dest);
-                    task = runWatchifyTask(subTask, taskName, task, dest);
-                } else {
-                    task = setSrc(subTask.src);
+            if(subTask.browserify) {
+                task = setBrowserify(subTask.src, subTask, taskName, dest);
+                task = runWatchifyTask(subTask, taskName, task, dest);
+            } else {
+                task = setSrc(subTask.src);
 
-                    task = setPipes(task, subTask.plugins, subTask.sourcemaps);
+                task = setPipes(task, subTask.plugins, subTask.sourcemaps);
 
-                    task = task.pipe(gulp.dest(dest));
-                }
+                task = task.pipe(gulp.dest(dest));
+            }
 
 
             if(taskCompletion) {
@@ -178,7 +178,7 @@ var createTasks = function createTasks(gulpInstance) {
      * @returns Array
      */
     function prepareSrc(srcPaths) {
-        
+
         var src = [],
             include = [];
 
@@ -201,7 +201,7 @@ var createTasks = function createTasks(gulpInstance) {
             srcPath = minimizePath(srcPath);
             gutil.log('Src path' + i + ':', gutil.colors.magenta(srcPath));
         });
-        
+
         return src;
     }
 
@@ -214,7 +214,7 @@ var createTasks = function createTasks(gulpInstance) {
     function minimizePath(path) {
         return path.replace(rootPath, '.');
     }
-    
+
     /**
      * Set source paths
      * @access private
@@ -227,7 +227,7 @@ var createTasks = function createTasks(gulpInstance) {
 
         return gulp.src(src);
     }
-    
+
     /**
      * Set browserify
      * @access private
@@ -237,11 +237,11 @@ var createTasks = function createTasks(gulpInstance) {
      * @returns {*}
      */
     function setBrowserify(srcPaths, subTask, taskName, dest) {
-        
+
         var src = prepareSrc(srcPaths),
             entries = [],
             b = null;
-        
+
         if(src.length) {
 
             gutil.log('Browserify enabled:', gutil.colors.blue(true));
@@ -251,24 +251,29 @@ var createTasks = function createTasks(gulpInstance) {
             });
 
             var opt = {
-                    entries: entries,
-                    debug: true,
-                    cache: {},
-                    packageCache: {},
-                    fullPaths: true
-                };
+                entries: entries,
+                debug: true,
+                cache: {},
+                packageCache: {},
+                fullPaths: true
+            };
 
-            b = subTask.browserify.watchify ? watchify(browserify(opt)) : browserify(opt);
+            b = browserify(opt);
             b = setTransforms(b, subTask.browserify.transform);
-            b.on('update', function(file) {
 
-                gutil.log('File: ' + gutil.colors.magenta(file) + ' was ' + gutil.colors.green('changed'));
-                return runWatchifyTask(subTask, taskName, b, dest);
-                
-            }.bind(this));
-            b = b.on('error', function(err) {
-                gutil.log(gutil.colors.red('Error:'),'Browserify Error');
-            });
+            if(subTask.browserify.watchify) {
+
+                b = b.plugin(watchify);
+                b = b.on('update', function(file) {
+
+                    gutil.log('File: ' + gutil.colors.magenta(file) + ' was ' + gutil.colors.green('changed'));
+                    return runWatchifyTask(subTask, taskName, b, dest);
+
+                }.bind(this));
+                b = b.on('error', function(err) {
+                    gutil.log(gutil.colors.red('Error:'),'Browserify Error');
+                });
+            }
         }
 
         return b;
@@ -278,7 +283,7 @@ var createTasks = function createTasks(gulpInstance) {
 
         var updateStart = Date.now(),
             file = subTask.browserify.file || taskName + '.js';
-        
+
         b = b.bundle();
         b = b.pipe(source(file));
         b = b.pipe(buffer());
@@ -289,7 +294,7 @@ var createTasks = function createTasks(gulpInstance) {
 
         return b;
     }
-    
+
     /**
      * Set browserify transforms
      * @access private
@@ -391,7 +396,7 @@ var createTasks = function createTasks(gulpInstance) {
             watch = watch.concat(include, exclude);
         } else {
 
-            
+
         }
 
         return watch;
