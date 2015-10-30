@@ -252,7 +252,10 @@ var createTasks = function createTasks(gulpInstance) {
 
             var opt = {
                     entries: entries,
-                    debug: true
+                    debug: true,
+                    cache: {},
+                    packageCache: {},
+                    fullPaths: true
                 };
 
             b = subTask.browserify.watchify ? watchify(browserify(opt)) : browserify(opt);
@@ -263,7 +266,9 @@ var createTasks = function createTasks(gulpInstance) {
                 return runWatchifyTask(subTask, taskName, b, dest);
                 
             }.bind(this));
-            b = b.on('error', gutil.log.bind(gutil, gutil.colors.red('Error:'),'Browserify Error'));
+            b = b.on('error', function(err) {
+                gutil.log.(gutil.colors.red('Error:'),'Browserify Error');
+            });
         }
 
         return b;
@@ -271,7 +276,8 @@ var createTasks = function createTasks(gulpInstance) {
 
     function runWatchifyTask(subTask, taskName, b, dest) {
 
-        var file = subTask.browserify.file || taskName + '.js';
+        var updateStart = Date.now(),
+            file = subTask.browserify.file || taskName + '.js';
         
         b = b.bundle();
         b = b.pipe(source(file));
