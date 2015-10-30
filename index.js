@@ -267,7 +267,7 @@ var createTasks = function createTasks(gulpInstance) {
                 
             }.bind(this));
             b = b.on('error', function(err) {
-                gutil.log.(gutil.colors.red('Error:'),'Browserify Error');
+                gutil.log(gutil.colors.red('Error:'),'Browserify Error');
             });
         }
 
