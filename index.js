@@ -263,6 +263,8 @@ var createTasks = function createTasks(gulpInstance) {
 
             if(subTask.browserify.watchify) {
 
+                gutil.log('Watchify enabled:', gutil.colors.blue(true));
+
                 b = b.plugin(watchify);
                 b = b.on('update', function(file) {
 
@@ -273,7 +275,7 @@ var createTasks = function createTasks(gulpInstance) {
 
                 b = b.on('log', function(msg) {
 
-                    gutil.log('Browserify:', gutil.colors.green(msg));
+                    gutil.log('Watchify:', gutil.colors.green(msg));
                 });
 
                 b = b.on('error', function(err) {
