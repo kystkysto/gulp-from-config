@@ -258,6 +258,8 @@ var createTasks = function createTasks(gulpInstance) {
                 fullPaths: true
             };
 
+            b.on('log', gutil.log); // output build logs to terminal
+
             b = browserify(opt);
             b = setTransforms(b, subTask.browserify.transform);
 
@@ -270,8 +272,15 @@ var createTasks = function createTasks(gulpInstance) {
                     return runWatchifyTask(subTask, taskName, b, dest);
 
                 }.bind(this));
+
+                b = b.on('log', function(msg) {
+
+                    gutil.log('Browserify:', gutil.colors.green(msg));
+                });
+
                 b = b.on('error', function(err) {
-                    gutil.log(gutil.colors.red('Error:'),'Browserify Error');
+
+                    gutil.log(gutil.colors.red('Error:'), err);
                 });
             }
         }
@@ -281,10 +290,13 @@ var createTasks = function createTasks(gulpInstance) {
 
     function runWatchifyTask(subTask, taskName, b, dest) {
 
-        var updateStart = Date.now(),
-            file = subTask.browserify.file || taskName + '.js';
+        var file = subTask.browserify.file || taskName + '.js';
 
         b = b.bundle();
+        b = b.on('error', function(err) {
+
+            gutil.log(gutil.colors.red('Error:'), err);
+        });
         b = b.pipe(source(file));
         b = b.pipe(buffer());
 
