@@ -258,8 +258,6 @@ var createTasks = function createTasks(gulpInstance) {
                 fullPaths: true
             };
 
-            b.on('log', gutil.log); // output build logs to terminal
-
             b = browserify(opt);
             b = setTransforms(b, subTask.browserify.transform);
 
