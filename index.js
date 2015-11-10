@@ -123,7 +123,7 @@ var createTasks = function createTasks(gulpInstance) {
         if (Object.keys(task.src).length &&
             Array.isArray(task.src.include) &&
             task.src.include.length &&
-            typeof(task.dest) === 'string') {
+            typeof task.dest === 'string') {
 
             return true;
         } else {
@@ -259,7 +259,7 @@ var createTasks = function createTasks(gulpInstance) {
             };
 
             b = browserify(opt);
-            b = setTransforms(b, subTask.browserify.transform);
+            b = setTransforms(b, subTask.browserify.transforms);
 
             if(subTask.browserify.watchify) {
 
@@ -268,7 +268,7 @@ var createTasks = function createTasks(gulpInstance) {
                 b = b.plugin(watchify);
                 b = b.on('update', function(file) {
 
-                    gutil.log('File: ' + gutil.colors.magenta(file) + ' was ' + gutil.colors.green('changed'));
+                    gutil.log('File:', gutil.colors.magenta(file), 'was', gutil.colors.green('changed'));
                     return runWatchifyTask(subTask, taskName, b, dest);
 
                 }.bind(this));
@@ -280,7 +280,7 @@ var createTasks = function createTasks(gulpInstance) {
 
                 b = b.on('error', function(err) {
 
-                    gutil.log(gutil.colors.red('Error:'), err);
+                    gutil.log(gutil.colors.red('Error:'), 'Browserify:', err.message);
                 });
             }
         }
@@ -295,7 +295,7 @@ var createTasks = function createTasks(gulpInstance) {
         b = b.bundle();
         b = b.on('error', function(err) {
 
-            gutil.log(gutil.colors.red('Error:'), err);
+            gutil.log(gutil.colors.red('Error:'), 'Wathify:', err.message);
         });
         b = b.pipe(source(file));
         b = b.pipe(buffer());
@@ -311,16 +311,20 @@ var createTasks = function createTasks(gulpInstance) {
      * Set browserify transforms
      * @access private
      * @param {Object} b
-     * @param {Array} transform
+     * @param {Array} transforms
      * @returns {*}
      */
     function setTransforms(b, transforms) {
 
-        var transform = requireTransforms(transforms);
+        var transforms = requireTransforms(transforms);
 
-        if(transform.length) {
+        if(transforms.length) {
 
-            b = b.transform(transform);
+            //b = b.transform(transforms);
+            transforms.forEach(function (transform) {
+
+                b = b.transform(transform);
+            });
         }
 
         return b;
@@ -328,30 +332,56 @@ var createTasks = function createTasks(gulpInstance) {
 
     /**
      * Require transform modules
-     * @param transform
+     * @param transforms
      * @returns {Array}
      */
-    function requireTransforms(transform) {
+    function requireTransforms(transforms) {
 
-        var transfoms = [];
+        var transfomsList = [];
 
-        if(Array.isArray(transform) && transform.length) {
+        if(Array.isArray(transforms) && transforms.length) {
 
-            transform.forEach(function(t) {
+            transforms.forEach(function(t) {
+
+                var plugin = null,
+                    transformName = t,
+                    transformation = null,
+                    optionsMsg = gutil.colors.yellow('no options');
 
                 try {
-                    var trans = require(t);
-                    gutil.log('Transform:',  gutil.colors.green(t));
-                    transfoms.push(trans);
+
+                    if(typeof t.name === 'string') {
+
+                        transformName = t.name;
+                    }
+
+                    plugin = require(transformName);
+
+                    transformation = plugin;
+
+                    if(t.options && Object.keys(t.options).length) {
+
+                        optionsMsg = t.options;
+                        transformation = [plugin, t.options];
+                    }
+
+                    gutil.log('Transform:',  gutil.colors.green(transformName), 'with options:', optionsMsg);
+
+                    transfomsList.push(transformation);
                 } catch (err) {
+
                     if (err.code === 'MODULE_NOT_FOUND') {
+
                         gutil.log(gutil.colors.red('Error:'), 'Transform does not exist', gutil.colors.green(t));
+                    } else {
+
+                        gutil.log(gutil.colors.red('Error:'), err.message);
                     }
                 }
             });
         }
 
-        return transfoms;
+        return transfomsList;
     }
 
     /**
@@ -378,7 +408,7 @@ var createTasks = function createTasks(gulpInstance) {
             task = gulp.watch(watch, [subTaskName])
 
                 .on('change', function(event) {
-                    gutil.log('File: ' + gutil.colors.magenta(event.path) + ' was ' + gutil.colors.green(event.type));
+                    gutil.log('File:', gutil.colors.magenta(event.path), 'was', gutil.colors.green(event.type));
                 });
 
             return task;
