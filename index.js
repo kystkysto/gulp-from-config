@@ -486,6 +486,8 @@ var createTasks = function createTasks(gulpInstance) {
      */
     function setPipes(task, plugins, sourcemaps) {
 
+        plugins = plugins === '~' ? storedConfig.plugins : plugins;
+
         if(Object.keys(task).length) {
 
             if(Array.isArray(plugins) && plugins.length) {
