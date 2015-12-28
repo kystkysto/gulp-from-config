@@ -16,6 +16,9 @@ var rootPath = process.cwd(),
     source = require('vinyl-source-stream'),
     buffer = require('vinyl-buffer'),
 
+// Store variable for sessions
+    storedConfig = {},
+
 // Gulp plugins
     gutil = require('gulp-util');
 
@@ -146,16 +149,23 @@ var createTasks = function createTasks(gulpInstance) {
 
         var taskCompletion = this.__taskCompletion;
 
+        storedConfig.src = subTask.src === '~' ? storedConfig.src : subTask.src;
+        storedConfig.dest = subTask.dest === '~' ? storedConfig.dest : subTask.dest;
+        storedConfig.plugins = subTask.plugins === '~' ? storedConfig.plugins : subTask.plugins;
+
         gulp.task(subTaskName, function (taskCompletion) {
 
             var task = {},
-                dest = rootPath + subTask.dest;
+                dest = rootPath + storedConfig.dest;
 
             if(subTask.browserify) {
-                task = setBrowserify(subTask.src, subTask, taskName, dest);
+
+                task = setBrowserify(storedConfig.src, subTask, taskName, dest);
                 task = runWatchifyTask(subTask, taskName, task, dest);
+
             } else {
-                task = setSrc(subTask.src);
+
+                task = setSrc(storedConfig.src);
 
                 task = setPipes(task, subTask.plugins, subTask.sourcemaps);
 
@@ -530,12 +540,14 @@ var createTasks = function createTasks(gulpInstance) {
      */
     function setPlugins(task, plugins) {
 
-        plugins.forEach(function (plugin) {
+        plugins.forEach(function (plugin, i) {
 
-            var pipe = pluginExist(plugin.name, plugin.options);
+            storedConfig.plugins[i] = plugin === '~' ? storedConfig.plugins[i] : plugin;
+
+            var pipe = pluginExist(storedConfig.plugins[i].name, storedConfig.plugins[i].options);
 
             if(pipe) {
-                task = task.pipe(pipe(plugin.options));
+                task = task.pipe(pipe(storedConfig.plugins[i].options));
             }
         });
 
@@ -619,7 +631,7 @@ var createTasks = function createTasks(gulpInstance) {
      */
     function getConfigFiles() {
 
-        var configs = glob.sync(configsPath + '/*.json');
+        var configs = glob.sync(configsPath + '/**/*.json');
         return configs;
     }
 
