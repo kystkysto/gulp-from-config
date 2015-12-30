@@ -16,9 +16,6 @@ var rootPath = process.cwd(),
     source = require('vinyl-source-stream'),
     buffer = require('vinyl-buffer'),
 
-// Store variable for sessions
-    storedConfig = {},
-
 // Gulp plugins
     gutil = require('gulp-util');
 
@@ -58,7 +55,6 @@ var createTasks = function createTasks(gulpInstance) {
             if(taskName) {
 
                 subTasks = createTask.call(this, config);
-
                 gulp.task(taskName, subTasks, function(){});
 
                 tasks.push(taskName);
@@ -81,11 +77,18 @@ var createTasks = function createTasks(gulpInstance) {
 
         var subTasks = [],
             subTaskName = '',
-            subTaskWatch = '';
+            subTaskWatch = '',
+            storedTask = {},
+            tmp = null;
 
         if(Array.isArray(config.subTasks) && config.subTasks.length) {
 
             config.subTasks.forEach(function (subTask) {
+
+                tmp = checkForReuse(subTask, storedTask);
+
+                subTask = tmp.current;
+                storedTask = tmp.stored;
 
                 if (!subTask.name) {
                     subTask.name = randomTaskName();
@@ -106,6 +109,7 @@ var createTasks = function createTasks(gulpInstance) {
 
                     createSubTask.call(this, subTaskName, subTask, config.name);
                 }
+
             }.bind(this));
         } else {
 
@@ -116,6 +120,63 @@ var createTasks = function createTasks(gulpInstance) {
     }
 
     /**
+     * Check if tilda used
+     * @access private
+     * @param {Object} config
+     * @returns {Array}
+     */
+    function checkForReuse(current, stored) {
+
+        for(var prop in current) {
+
+            if(current.hasOwnProperty(prop)) {
+
+                if(current[prop] === '~') {
+
+                    current[prop] = stored[prop];
+
+                } else if(prop === 'plugins') {
+
+                    current.plugins.forEach(function(currentPlugin, i) {
+
+                        if(typeof currentPlugin === 'string' && currentPlugin.charAt(0) === '~') {
+
+                            var pluginName = currentPlugin.slice(1);
+
+                            stored.plugins.forEach(function(storedPlugin, y) {
+
+                                if(storedPlugin.name === pluginName) {
+
+                                    current.plugins[i] = storedPlugin;
+                                }
+                            });
+                        } else {
+
+                            if(stored.plugins) {
+
+                                stored.plugins.push(currentPlugin);
+                            } else {
+
+                                stored.plugins = [currentPlugin];
+                            }
+                        }
+                    });
+
+
+                } else {
+
+                    stored[prop] = current[prop];
+                }
+            }
+        }
+
+        return {
+            current: current,
+            stored: stored
+        };
+    }
+
+    /**
      * Check if subtask is valid
      * @access private
      * @param {Object} task
@@ -123,10 +184,21 @@ var createTasks = function createTasks(gulpInstance) {
      */
     function isSubTaskValid(task) {
 
-        if (Object.keys(task.src).length &&
-            Array.isArray(task.src.include) &&
-            task.src.include.length &&
-            typeof task.dest === 'string') {
+        if (
+            (
+                task.src === '~' ||
+                (
+                    Object.keys(task.src).length &&
+                    Array.isArray(task.src.include) &&
+                    task.src.include.length
+                )
+            )
+                &&
+            (
+                task.dest ||
+                typeof task.dest === 'string'
+            )
+        ) {
 
             return true;
         } else {
@@ -149,23 +221,19 @@ var createTasks = function createTasks(gulpInstance) {
 
         var taskCompletion = this.__taskCompletion;
 
-        storedConfig.src = subTask.src === '~' ? storedConfig.src : subTask.src;
-        storedConfig.dest = subTask.dest === '~' ? storedConfig.dest : subTask.dest;
-        storedConfig.plugins = subTask.plugins === '~' ? storedConfig.plugins : subTask.plugins;
-
         gulp.task(subTaskName, function (taskCompletion) {
 
             var task = {},
-                dest = rootPath + storedConfig.dest;
+                dest = rootPath + subTask.dest;
 
             if(subTask.browserify) {
 
-                task = setBrowserify(storedConfig.src, subTask, taskName, dest);
+                task = setBrowserify(subTask.src, subTask, taskName, dest);
                 task = runWatchifyTask(subTask, taskName, task, dest);
 
             } else {
 
-                task = setSrc(storedConfig.src);
+                task = setSrc(subTask.src);
 
                 task = setPipes(task, subTask.plugins, subTask.sourcemaps);
 
@@ -486,8 +554,6 @@ var createTasks = function createTasks(gulpInstance) {
      */
     function setPipes(task, plugins, sourcemaps) {
 
-        plugins = plugins === '~' ? storedConfig.plugins : plugins;
-
         if(Object.keys(task).length) {
 
             if(Array.isArray(plugins) && plugins.length) {
@@ -544,12 +610,10 @@ var createTasks = function createTasks(gulpInstance) {
 
         plugins.forEach(function (plugin, i) {
 
-            storedConfig.plugins[i] = plugin === '~' ? storedConfig.plugins[i] : plugin;
-
-            var pipe = pluginExist(storedConfig.plugins[i].name, storedConfig.plugins[i].options);
+            var pipe = pluginExist(plugin.name, plugin.options);
 
             if(pipe) {
-                task = task.pipe(pipe(storedConfig.plugins[i].options));
+                task = task.pipe(pipe(plugin.options));
             }
         });
 
