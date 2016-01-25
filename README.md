@@ -170,7 +170,14 @@ var gulp = require('gulp'),
                     }
                 }
             ]
-        }
+        },
+        {
+            "similarSubTask",
+            "dest" "~",
+            "src": "~", // use ~ to get any props from previous subtasks
+            "plugins": [
+                "~gulp-uglify" // use ~PLUGIN_NAME if you wish to copy this plugin config from previous subtask (or use plugins: "~" to repeat all pugins)
+            ]
         }
     ]
 };
@@ -191,6 +198,10 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 - **0.3.0** Removed gulp-load-plugins from dependency
 
+- **0.4.0** Nested config folder
+
+- **0.4.1** Use ~ instead of repeating previus config
+
 ## License
 
-Copyright (c) 2015 kystkysto. Licensed under the MIT license.
+Copyright (c) 2016 kystkysto. Licensed under the MIT license.

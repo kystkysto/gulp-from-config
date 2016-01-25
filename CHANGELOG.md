@@ -19,3 +19,13 @@
 ** 10, 2015**
 
 * Removed gulp-load-plugins from dependency
+
+## v0.4.0
+** 12, 2015**
+
+* Nested config folder
+
+## 0.4.1
+** 01, 2015**
+
+* Use ~ instead of repeating previus config

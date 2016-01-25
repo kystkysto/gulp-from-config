@@ -366,6 +366,14 @@ var createTasks = function createTasks(gulpInstance) {
         return b;
     }
 
+    /**
+     * Prepare tsks for wathify
+     * @param subTask
+     * @param taskName
+     * @param b
+     * @param dest
+     * @returns {*}
+     */
     function runWatchifyTask(subTask, taskName, b, dest) {
 
         var file = subTask.browserify.file || taskName + '.js';
