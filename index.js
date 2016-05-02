@@ -6,12 +6,9 @@
 
 // Root path
 var rootPath = process.cwd(),
-    gulp,
-    __config,
-    __configs = [],
-    __taskCompletion = function(config) {},
 
 // Npm modules
+    gulp,
     path = require('path'),
     glob = require('glob'),
     browserify = require('browserify'),
@@ -29,10 +26,9 @@ var rootPath = process.cwd(),
  * @access private
  * @returns {Array} tasks
  */
-function addTasks() {
+function addTasks(configs, taskCompletion) {
 
-    var configs = getConfigs(),
-        tasks = [],
+    var tasks = [],
         subTasks;
 
     configs.forEach(function (config) {
@@ -41,7 +37,7 @@ function addTasks() {
 
         if(taskName) {
 
-            subTasks = createTask(config);
+            subTasks = createTask(config, taskCompletion);
             gulp.task(taskName, subTasks, function(){});
 
             tasks.push(taskName);
@@ -60,7 +56,7 @@ function addTasks() {
  * @param {Object} config
  * @returns {Array}
  */
-function createTask(config) {
+function createTask(config, taskCompletion) {
 
     var subTasks = [],
         subTaskName = '',
@@ -94,7 +90,7 @@ function createTask(config) {
                     subTasks.push(subTaskWatch);
                 }
 
-                createSubTask(subTaskName, subTask, config.name);
+                createSubTask(subTaskName, subTask, config.name, taskCompletion);
             }
 
         });
@@ -204,7 +200,7 @@ function isSubTaskValid(task) {
  * @param {string} subTaskName
  * @param {Object} subTask
  */
-function createSubTask(subTaskName, subTask, taskName) {
+function createSubTask(subTaskName, subTask, taskName, taskCompletion) {
 
     gulp.task(subTaskName, function (taskCompletion) {
 
@@ -231,7 +227,7 @@ function createSubTask(subTaskName, subTask, taskName) {
         }
 
         return task;
-    }.bind(this, __taskCompletion));
+    }.bind(this, taskCompletion));
 }
 
 /**
@@ -640,31 +636,14 @@ function pluginExist(pluginName, options) {
 }
 
 /**
- * Parse configs content
+ * Get list of all *.json config files
  * @access private
- * @param {Array} files
- * @returns {Array}
+ * @returns {*}
  */
-function getConfigs() {
+function getConfigFiles(configsPath) {
 
-    var configs = [];
-
-    if(__configs.length) {
-        return __configs;
-    }
-
-    var files = getConfigFiles();
-
-    if(Array.isArray(files) && files.length) {
-
-        files.forEach(function(file) {
-
-            var config = getConfigFromFile(file);
-            configs.push(config);
-        });
-    }
-
-    return configs;
+    var files = glob.sync(configsPath + '/**/*.json');
+    return files;
 }
 
 /**
@@ -683,16 +662,6 @@ function getConfigFromFile(fileName) {
     return require(fileName);
 }
 
-/**
- * Get list of all *.json config files
- * @access private
- * @returns {*}
- */
-function getConfigFiles() {
-
-    var configs = glob.sync(configsPath + '/**/*.json');
-    return configs;
-}
 
 /**
  * Generate random string for task name
@@ -704,53 +673,13 @@ function randomTaskName() {
     return Math.random().toString(36).substring(7);
 }
 
-/**
- * Define and return tasks
- * @access public
- * @param {Object} gulp - instanse of gulp
- * @param {Object} gulpPlugins - instance of gulp-load-plugins
- * @returns {Array} tasks
- */
-function createTasks(gulpInstance) {
-
-    // Gulp
-    gulp = gulpInstance,
-
-    // Main config
-        mainConfig = __config,
-
-    // Path og config files
-        configsPath = mainConfig ? mainConfig.paths.config : path.join(rootPath, 'configs');
-
-    return addTasks();
-};
-
-/**
- * Set configs path
- * @access public
- * @param {string} configsPath
- * @example
- * // Will set path to configs <appRoot>/configs/
- * gulpFromConfig.setConfigsPath('configs');
- * @returns {boolean}
- */
-function setConfigsPath(configsPath) {
-
-    __config = {
-        paths: {
-            config: path.join(rootPath, configsPath)
-        }
-    };
-    return __config;
-};
 
 /**
  * Set task configs
  * @access public
  * @param {Array} configs
  * @example
- * // Will set path to configs <appRoot>/configs/
- * gulpFromConfig.setConfigs([
+ * [
  *   {
  *     name: "taskName",
  *       subTasks: [
@@ -772,10 +701,12 @@ function setConfigsPath(configsPath) {
  *       }
  *     ]
  *   }
- * ]);
- * @returns {boolean}
+ * ]
+ * @returns {Array}
  */
 function setConfigs(configs) {
+
+    var __configs = [];
 
     if(Array.isArray(configs) && configs.length) {
 
@@ -789,37 +720,61 @@ function setConfigs(configs) {
 
             __configs.push(config);
 
-            return configs;
+            return true;
 
         });
 
-        return configs;
+        return __configs;
     } else {
 
-        gutil.log(gutil.colors.red('Error:'),'must be array of configurations');
+        gutil.log(gutil.colors.red('Error:'),'must be array of configuration objects');
         process.exit(1);
     }
-};
+}
 
 /**
- * Set callback which called on task completion
- * @param {Function} callback
+ * Parse configs content
+ * @access private
+ * @param {Array} files
+ * @returns {Array}
  */
-function setCallback(callback) {
+function getConfigs(configsPath) {
 
-    if(typeof callback === 'function') {
-        __taskCompletion = callback;
-    } else {
-        gutil.log(gutil.colors.yellow('Warning:'), 'taskCompletion is not a function');
+    var configs = [],
+        configsPath = configsPath ? path.join(rootPath, configsPath) : path.join(rootPath, 'configs'),
+        files = getConfigFiles(configsPath);
+
+    if(Array.isArray(files) && files.length) {
+
+        files.forEach(function(file) {
+
+            var config = getConfigFromFile(file);
+            configs.push(config);
+        });
     }
-};
+
+    return configs;
+}
+
+/**
+ * Define and return tasks
+ * @access public
+ * @param {Object} gulp - instanse of gulp
+ * @param {Object} gulpPlugins - instance of gulp-load-plugins
+ * @returns {Array} tasks
+ */
+function createTasks(gulpInstance, configs, taskCompletion) {
+
+    // Gulp
+    gulp = gulpInstance;
+
+    var __configs = setConfigs(configs),
+        taskCompletion = taskCompletion || function(config) {};
+
+    return addTasks(__configs, taskCompletion);
+}
 
 module.exports = {
-    __config: __config,
-    __configs: __configs,
-    __taskCompletion: __taskCompletion,
-    setCallback: setCallback,
-    setConfigs: setConfigs,
-    setConfigsPath: setConfigsPath,
+    getConfigs: getConfigs,
     createTasks: createTasks
 };
