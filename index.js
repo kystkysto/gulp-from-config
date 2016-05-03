@@ -60,7 +60,6 @@ function createTask(config, taskCompletion) {
 
     var subTasks = [],
         subTaskName = '',
-        subTaskWatch = '',
         storedTask = {},
         tmp = null;
 
@@ -78,19 +77,12 @@ function createTask(config, taskCompletion) {
             }
 
             subTaskName = config.name + ':' + subTask.name;
-            subTaskWatch = config.name + ':watch:' + subTask.name;
 
             if (isSubTaskValid(subTask)) {
 
-                subTasks.push(subTaskName);
-                if (typeof subTask.watch !== "undefined") {
-
-                    setWatch(subTaskName, subTaskWatch, subTask);
-
-                    subTasks.push(subTaskWatch);
-                }
-
                 createSubTask(subTaskName, subTask, config.name, taskCompletion);
+
+                subTasks.push(subTaskName);
             }
 
         });
@@ -202,7 +194,16 @@ function isSubTaskValid(task) {
  */
 function createSubTask(subTaskName, subTask, taskName, taskCompletion) {
 
-    gulp.task(subTaskName, function (taskCompletion) {
+    var subTaskWatch = taskName + ':watch:' + subTask.name,
+        watchTaks = [];
+
+    if (!subTask.browserify && typeof subTask.watch !== "undefined") {
+        
+        setWatch(subTaskName, subTaskWatch, subTask);
+        watchTaks.push(subTaskWatch);
+    }
+
+    gulp.task(subTaskName, watchTaks, function (taskCompletion) {
 
         var task = {},
             dest = rootPath + subTask.dest;
@@ -220,7 +221,6 @@ function createSubTask(subTaskName, subTask, taskName, taskCompletion) {
 
             task = task.pipe(gulp.dest(dest));
         }
-
 
         if(taskCompletion) {
             taskCompletion(subTask);
