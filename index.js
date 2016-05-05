@@ -387,8 +387,7 @@ function setTransforms(b, transforms) {
 
     if(transforms.length) {
 
-        //b = b.transform(transforms);
-        transforms.forEach(function (transform) {
+        transforms.forEach(function(transform) {
 
             b = b.transform(transform);
         });
@@ -524,7 +523,7 @@ function setFullPaths(src) {
 
     if(src instanceof Array) {
 
-        src.forEach(function (path) {
+        src.forEach(function(path) {
 
             paths.push(rootPath + path);
         });
@@ -597,7 +596,7 @@ function setSourceMaps(task, sourcemaps, plugins, setPlugins) {
  */
 function setPlugins(task, plugins) {
 
-    plugins.forEach(function (plugin, i) {
+    plugins.forEach(function(plugin, i) {
 
         var pipe = pluginExist(plugin.name, plugin.options);
 
@@ -614,7 +613,7 @@ function setPlugins(task, plugins) {
  * Check if plugin exists
  * @access private
  * @param {Object} plugin
- * @returns {boolean}
+ * @returns {Object}
  */
 function pluginExist(pluginName, options) {
 
@@ -675,9 +674,10 @@ function randomTaskName() {
 
 
 /**
- * Set task configs
- * @access public
+ * Validate task configs
+ * @access private
  * @param {Array} configs
+ * @returns {Array} configs - array with configuration objects
  * @example
  * [
  *   {
@@ -734,9 +734,9 @@ function setConfigs(configs) {
 
 /**
  * Parse configs content
- * @access private
- * @param {Array} files
- * @returns {Array}
+ * @access public
+ * @param {Array} configsPath - path to configurations
+ * @returns {Array} configs - array with configuration objects
  */
 function getConfigs(configsPath) {
 
@@ -760,8 +760,9 @@ function getConfigs(configsPath) {
  * Define and return tasks
  * @access public
  * @param {Object} gulp - instanse of gulp
- * @param {Object} gulpPlugins - instance of gulp-load-plugins
- * @returns {Array} tasks
+ * @param {Array} configs - array with configuration objects
+ * @param {Array} taskCompletion - callbacj on task compleation
+ * @returns {Array} tasks - array of all tasks
  */
 function createTasks(gulpInstance, configs, taskCompletion) {
 
@@ -775,6 +776,37 @@ function createTasks(gulpInstance, configs, taskCompletion) {
 }
 
 module.exports = {
+    
+    /**
+     * Private functions
+     */
+    _addTasks: addTasks,
+    _createTask: createTask,
+    _checkForReuse: checkForReuse,
+    _isSubTaskValid: isSubTaskValid,
+    _createSubTask: createSubTask,
+    _prepareSrc: prepareSrc,
+    _minimizePath: minimizePath,
+    _setSrc: setSrc,
+    _setBrowserify: setBrowserify,
+    _runWatchifyTask: runWatchifyTask,
+    _setTransforms: setTransforms,
+    _requireTransforms: requireTransforms,
+    _setWatch: setWatch,
+    _setWatchPaths: setWatchPaths,
+    _setFullPaths: setFullPaths,
+    _setPipes: setPipes,
+    _setSourceMaps: setSourceMaps,
+    _setPlugins: setPlugins,
+    _pluginExist: pluginExist,
+    _getConfigFiles: getConfigFiles,
+    _getConfigFromFile: getConfigFromFile,
+    _randomTaskName: randomTaskName,
+    _setConfigs: setConfigs,
+
+    /**
+     * Public functions
+     */
     getConfigs: getConfigs,
     createTasks: createTasks
 };

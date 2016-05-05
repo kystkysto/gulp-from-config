@@ -30,9 +30,11 @@
     "path": "0.12.7",
     "vinyl-buffer": "1.0.0",
     "vinyl-source-stream": "1.1.0",
-    "watchify": "^3.5.0"
+    "watchify": "3.5.0"
   },
   "devDependencies": {
-    "chai": "~3.5.0"
+    "chai": "~3.5.0",
+    "sinon": "~1.17.4",
+    "mock-fs": "~3.9.0"
   }
 }
