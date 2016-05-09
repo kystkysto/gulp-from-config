@@ -598,10 +598,18 @@ function setPlugins(task, plugins) {
 
     plugins.forEach(function(plugin, i) {
 
-        var pipe = pluginExist(plugin.name, plugin.options);
+        var pipe = pluginExist(plugin.name);
 
         if(pipe) {
             task = task.pipe(pipe(plugin.options));
+
+            gutil.log('Plugin:',
+                gutil.colors.green(plugin.name),
+                'with options:',
+                plugin.options || gutil.colors.yellow('no options')
+            );
+        } else {
+            gutil.log(gutil.colors.red('Error:'), 'Plugin', gutil.colors.green(plugin.name), 'not found');
         }
     });
 
@@ -612,24 +620,14 @@ function setPlugins(task, plugins) {
 /**
  * Check if plugin exists
  * @access private
- * @param {Object} plugin
- * @returns {Object}
+ * @param {String} pluginName
+ * @returns {Function}
  */
-function pluginExist(pluginName, options) {
+function pluginExist(pluginName) {
 
     try {
-        var plugin = require(pluginName);
-
-        gutil.log('Plugin:',
-            gutil.colors.green(pluginName),
-            'with options:',
-            options || gutil.colors.yellow('no options')
-        );
-
-        return plugin;
+        return require(pluginName);
     } catch(err) {
-
-        gutil.log(gutil.colors.red('Error:'), 'Plugin', gutil.colors.green(pluginName), 'not found');
         return false;
     }
 }
@@ -637,7 +635,8 @@ function pluginExist(pluginName, options) {
 /**
  * Get list of all *.json config files
  * @access private
- * @returns {*}
+ * @param {String} configsPath
+ * @returns {Array}
  */
 function getConfigFiles(configsPath) {
 
@@ -649,13 +648,14 @@ function getConfigFiles(configsPath) {
  * Get content of each config file
  * @access private
  * @param {string} fileName
- * @returns {*}
+ * @returns {Object}
  */
 function getConfigFromFile(fileName) {
 
     if(!fileExists(fileName)) {
 
         gutil.log(gutil.colors.red('Error:'), 'config file doesn\'t exist');
+        return false;
     }
 
     return require(fileName);
@@ -702,7 +702,6 @@ function randomTaskName() {
  *     ]
  *   }
  * ]
- * @returns {Array}
  */
 function setConfigs(configs) {
 
@@ -735,7 +734,7 @@ function setConfigs(configs) {
 /**
  * Parse configs content
  * @access public
- * @param {Array} configsPath - path to configurations
+ * @param {String} configsPath - path to configurations
  * @returns {Array} configs - array with configuration objects
  */
 function getConfigs(configsPath) {
@@ -749,7 +748,11 @@ function getConfigs(configsPath) {
         files.forEach(function(file) {
 
             var config = getConfigFromFile(file);
-            configs.push(config);
+            
+            if(config) {
+
+                configs.push(config);
+            }
         });
     }
 
@@ -777,6 +780,8 @@ function createTasks(gulpInstance, configs, taskCompletion) {
 
 module.exports = {
     
+    _gulp: gulp,
+
     /**
      * Private functions
      */
