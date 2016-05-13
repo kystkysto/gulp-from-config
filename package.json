@@ -34,7 +34,8 @@
   },
   "devDependencies": {
     "chai": "~3.5.0",
-    "sinon": "~1.17.4",
-    "mock-fs": "~3.9.0"
+    "mock-fs": "~3.9.0",
+    "rewire": "^2.5.1",
+    "sinon": "~1.17.4"
   }
 }

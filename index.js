@@ -563,7 +563,7 @@ function setPipes(task, plugins, sourcemaps) {
  * @param {Object} task
  * @param {bolean} sourcemaps
  * @param {Array} plugins
- * @param {Function} setPlugins - callback for plugins
+ * @param {Function} setPlugins
  * @returns {*}
  */
 function setSourceMaps(task, sourcemaps, plugins, setPlugins) {
@@ -598,6 +598,8 @@ function setPlugins(task, plugins) {
 
     plugins.forEach(function(plugin, i) {
 
+        gutil.colors.yellow('no options');
+
         var pipe = pluginExist(plugin.name);
 
         if(pipe) {
@@ -609,6 +611,7 @@ function setPlugins(task, plugins) {
                 plugin.options || gutil.colors.yellow('no options')
             );
         } else {
+
             gutil.log(gutil.colors.red('Error:'), 'Plugin', gutil.colors.green(plugin.name), 'not found');
         }
     });
@@ -705,7 +708,7 @@ function randomTaskName() {
  */
 function setConfigs(configs) {
 
-    var __configs = [];
+    var _configs = [];
 
     if(Array.isArray(configs) && configs.length) {
 
@@ -713,17 +716,17 @@ function setConfigs(configs) {
 
             if (!Object.keys(config).length) {
 
-                gutil.log(gutil.colors.red('Error:'), 'wrong config format is passed');
+                gutil.log(gutil.colors.yellow('Warning:'), 'empty config is passed');
                 return false;
             }
 
-            __configs.push(config);
+            _configs.push(config);
 
             return true;
 
         });
 
-        return __configs;
+        return _configs;
     } else {
 
         gutil.log(gutil.colors.red('Error:'),'must be array of configuration objects');
@@ -779,39 +782,6 @@ function createTasks(gulpInstance, configs, taskCompletion) {
 }
 
 module.exports = {
-    
-    _gulp: gulp,
-
-    /**
-     * Private functions
-     */
-    _addTasks: addTasks,
-    _createTask: createTask,
-    _checkForReuse: checkForReuse,
-    _isSubTaskValid: isSubTaskValid,
-    _createSubTask: createSubTask,
-    _prepareSrc: prepareSrc,
-    _minimizePath: minimizePath,
-    _setSrc: setSrc,
-    _setBrowserify: setBrowserify,
-    _runWatchifyTask: runWatchifyTask,
-    _setTransforms: setTransforms,
-    _requireTransforms: requireTransforms,
-    _setWatch: setWatch,
-    _setWatchPaths: setWatchPaths,
-    _setFullPaths: setFullPaths,
-    _setPipes: setPipes,
-    _setSourceMaps: setSourceMaps,
-    _setPlugins: setPlugins,
-    _pluginExist: pluginExist,
-    _getConfigFiles: getConfigFiles,
-    _getConfigFromFile: getConfigFromFile,
-    _randomTaskName: randomTaskName,
-    _setConfigs: setConfigs,
-
-    /**
-     * Public functions
-     */
     getConfigs: getConfigs,
     createTasks: createTasks
 };
