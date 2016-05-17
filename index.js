@@ -516,20 +516,19 @@ function setWatchPaths(subTask) {
  * @param {Array} src
  * @returns {Array}
  */
-function setFullPaths(src) {
+function setFullPaths(paths) {
 
-    var paths = [];
+    var _paths = [];
 
+    if(paths instanceof Array) {
 
-    if(src instanceof Array) {
+        paths.forEach(function(path) {
 
-        src.forEach(function(path) {
-
-            paths.push(rootPath + path);
+            _paths.push(rootPath + path);
         });
     }
 
-    return paths;
+    return _paths;
 }
 
 /**
@@ -542,16 +541,13 @@ function setFullPaths(src) {
  */
 function setPipes(task, plugins, sourcemaps) {
 
-    if(Object.keys(task).length) {
+    if(Array.isArray(plugins) && plugins.length) {
 
-        if(Array.isArray(plugins) && plugins.length) {
+        gutil.log('Sourcemap enabled:', gutil.colors.blue(sourcemaps));
 
-            gutil.log('Sourcemap enabled:', gutil.colors.blue(sourcemaps));
-
-            task = setSourceMaps(task, sourcemaps, plugins, setPlugins);
-        } else {
-            gutil.log(gutil.colors.yellow('Warning:'), 'no plugins');
-        }
+        task = setSourceMaps(task, sourcemaps, plugins);
+    } else {
+        gutil.log(gutil.colors.yellow('Warning:'), 'no plugins');
     }
 
     return task;
@@ -563,10 +559,9 @@ function setPipes(task, plugins, sourcemaps) {
  * @param {Object} task
  * @param {bolean} sourcemaps
  * @param {Array} plugins
- * @param {Function} setPlugins
  * @returns {*}
  */
-function setSourceMaps(task, sourcemaps, plugins, setPlugins) {
+function setSourceMaps(task, sourcemaps, plugins) {
 
     var pipe = null;
 
@@ -582,6 +577,8 @@ function setSourceMaps(task, sourcemaps, plugins, setPlugins) {
 
     if(pipe) {
         task = task.pipe(pipe.write('./maps'));
+
+
     }
 
     return task;

@@ -15,7 +15,8 @@ describe('gulp-from-config', function () {
         redSpy,
         greenSpy,
         yellowSpy,
-        cyanSpy;
+        cyanSpy,
+        blueSpy;
 
     function prepareSpyes() {
 
@@ -24,6 +25,7 @@ describe('gulp-from-config', function () {
         greenSpy = sinon.spy();
         yellowSpy = sinon.spy();
         cyanSpy = sinon.spy();
+        blueSpy = sinon.spy();
 
         gutil = set('gutil', {
             log: logSpy,
@@ -31,7 +33,8 @@ describe('gulp-from-config', function () {
                 red: redSpy,
                 green: greenSpy,
                 yellow: yellowSpy,
-                cyan: cyanSpy
+                cyan: cyanSpy,
+                blue: blueSpy
             }
         });
     }
@@ -350,14 +353,20 @@ describe('gulp-from-config', function () {
 
         describe('setSourceMaps', function () {
 
-            var setPlugins,
+            var setSourceMaps,
+                setPluginsMock,
                 taskMock,
+                sourceMaps = true,
                 initSpy,
                 writeSpy,
                 pipeSpy,
-                setSourceMapsMock;
+                pluginExistMock;
 
             before(function () {
+
+                initSpy = sinon.spy();
+                writeSpy = sinon.spy();
+                pipeSpy = sinon.spy();
 
                 taskMock = new function() {
 
@@ -367,13 +376,156 @@ describe('gulp-from-config', function () {
                     }.bind(this);
                 };
 
-                setPlugins = set('pluginExist', {
-                    init: initSpy,
-                    write: writeSpy
+                pluginExistMock = set('pluginExist', function() {
+                    return {
+                        init: initSpy
+                        ,write: writeSpy
+                    }
                 });
 
-                setSourceMapsMock = get('setSourceMaps');
+                setPluginsMock = set('setPlugins', function() {
+                    return taskMock;
+                });
+
+                setSourceMaps = get('setSourceMaps');
             });
+
+            describe('sourcemaps required', function() {
+
+                it('should set sourcemaps and return task', function () {
+
+                    expect(setSourceMaps(taskMock, sourceMaps)).to.equal(taskMock);
+                    expect(pipeSpy.calledTwice).to.be.ok;
+                    expect(initSpy.calledWith({loadMaps: true})).to.be.ok;
+                    expect(writeSpy.calledOnce).to.be.ok;
+                });
+            });
+
+            describe('sourcemaps are not required', function () {
+
+                before(function () {
+
+                    sourceMaps = false;
+
+                    initSpy = sinon.spy();
+                    writeSpy = sinon.spy();
+                    pipeSpy = sinon.spy();
+                });
+
+                it('shouldn\'t  set sourcemapsk', function () {
+
+                    expect(setSourceMaps(taskMock, sourceMaps)).to.equal(taskMock);
+                    expect(pipeSpy.called).to.be.false;
+                    expect(initSpy.called).to.be.false;
+                    expect(writeSpy.called).to.be.false;
+                });
+            });
+
+            after(function () {
+
+                pluginExistMock();
+                setPluginsMock();
+            })
         });
+
+        describe('setPipes', function () {
+
+            var setSourceMapsMock,
+                taskMock = {},
+                plugins,
+                setPipes;
+
+            before(function () {
+
+                setPipes = get('setPipes');
+
+                setSourceMapsMock = set('setSourceMaps', function () {
+
+                    return taskMock;
+                });
+            });
+
+            describe('plugins are passed', function () {
+
+                before(function () {
+
+                    prepareSpyes();
+
+                    plugins = [{}];
+                });
+
+                it('should set plugins', function () {
+
+                    expect(setPipes(taskMock, plugins)).to.equal(taskMock);
+                    expect(logSpy.calledOnce).to.be.ok;
+                    expect(blueSpy.calledOnce).to.be.ok;
+                });
+            });
+
+            describe('plugins undefined', function () {
+
+                before(function () {
+
+                    prepareSpyes();
+
+                    plugins = null;
+                });
+
+                it('should log warning and return task', function () {
+
+                    expect(setPipes(taskMock, plugins)).to.equal(taskMock);
+                    expect(logSpy.calledOnce).to.be.ok;
+                    expect(yellowSpy.calledOnce).to.be.ok;
+                });
+            });
+
+            after(function () {
+
+                setSourceMapsMock();
+            })
+        });
+
+        describe('setFullPaths', function () {
+
+            var paths,
+                rootPathMock,
+                setFullPaths;
+
+            before(function () {
+
+                paths = [
+                    'one',
+                    'two',
+                ];
+
+                rootPathMock = set('rootPath', '/test/');
+                setFullPaths = get('setFullPaths');
+            });
+
+            it('should return absolute paths', function () {
+
+                var fullPaths = setFullPaths(paths);
+
+                expect(fullPaths)
+                    .to.be.an('array')
+                    .length.of.at.least(2)
+                    .to.eql([
+                        '/test/one',
+                        '/test/two',
+                    ]);
+            });
+
+            after(function () {
+
+                rootPathMock();
+            })
+        });
+
+        describe('setWatchPaths', function () {
+
+            var taskMock,
+                setFullPathsMock;
+
+        })
     });
 });
