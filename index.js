@@ -16,9 +16,15 @@ var rootPath = process.cwd(),
     fileExists = require('file-exists'),
     source = require('vinyl-source-stream'),
     buffer = require('vinyl-buffer'),
+    minimist = require('minimist'),
 
 // Gulp plugins
-    gutil = require('gulp-util');
+    gutil = require('gulp-util'),
+    enviroments = [
+        'dev',
+        'test',
+        'prod'
+    ];
 
 
 /**
@@ -703,7 +709,7 @@ function randomTaskName() {
  *   }
  * ]
  */
-function setConfigs(configs) {
+function setConfigs(configs, env) {
 
     var _configs = [];
 
@@ -717,7 +723,7 @@ function setConfigs(configs) {
                 return false;
             }
 
-            _configs.push(config);
+            _configs.push(setConfigEnvironment(config, env));
 
             return true;
 
@@ -729,6 +735,52 @@ function setConfigs(configs) {
         gutil.log(gutil.colors.red('Error:'),'must be array of configuration objects');
         process.exit(1);
     }
+}
+
+function setConfigEnvironment(config, env) {
+
+    var subTasks = config.subTasks;
+
+    subTasks.forEach(function (task) {
+
+        for(item in task) {
+
+            var isEnv = false;
+
+            for(var i = 0; i < enviroments.length; i ++) {
+
+                if (task[item][enviroments[i]]) {
+
+                    isEnv = true;
+                    break;
+                }
+            }
+
+            if(isEnv) {
+
+                if(task[item][env]) {
+
+                    task[item] = task[item][env];
+                } else {
+
+                    task[item] = task[item][Object.keys(task[item])[0]];
+                }
+
+            } else if(item === 'plugins' && task['plugins'] !== '~') {
+
+                task['plugins'] = task['plugins'].filter(function (plugin) {
+
+                    if(plugin.env && plugin.env !== env) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                });
+            }
+        }
+    });
+
+    return config;
 }
 
 /**
@@ -758,7 +810,6 @@ function getConfigs(configsPath) {
 
     return configs;
 }
-
 /**
  * Define and return tasks
  * @access public
@@ -769,10 +820,17 @@ function getConfigs(configsPath) {
  */
 function createTasks(gulpInstance, configs, taskCompletion) {
 
+    var argv = minimist(process.argv),
+        env = argv.env || 'dev';
+
+    if(argv.env) {
+        gutil.log('Environment is set to:', gutil.colors.blue(env));
+    }
+
     // Gulp
     gulp = gulpInstance;
 
-    var __configs = setConfigs(configs),
+    var __configs = setConfigs(configs, env),
         taskCompletion = taskCompletion || function(config) {};
 
     return addTasks(__configs, taskCompletion);

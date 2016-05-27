@@ -27,6 +27,7 @@
     "glob": "5.0.14",
     "gulp-jshint": "1.11.2",
     "gulp-util": "3.0.6",
+    "minimist": "^1.2.0",
     "path": "0.12.7",
     "vinyl-buffer": "1.0.0",
     "vinyl-source-stream": "1.1.0",

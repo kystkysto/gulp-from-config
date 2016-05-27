@@ -16,7 +16,8 @@ describe('gulp-from-config', function () {
         greenSpy,
         yellowSpy,
         cyanSpy,
-        blueSpy;
+        blueSpy,
+        magentaSpy;
 
     function prepareSpyes() {
 
@@ -26,6 +27,7 @@ describe('gulp-from-config', function () {
         yellowSpy = sinon.spy();
         cyanSpy = sinon.spy();
         blueSpy = sinon.spy();
+        magentaSpy = sinon.spy();
 
         gutil = set('gutil', {
             log: logSpy,
@@ -34,7 +36,8 @@ describe('gulp-from-config', function () {
                 green: greenSpy,
                 yellow: yellowSpy,
                 cyan: cyanSpy,
-                blue: blueSpy
+                blue: blueSpy,
+                magenta: magentaSpy
             }
         });
     }
@@ -523,9 +526,111 @@ describe('gulp-from-config', function () {
 
         describe('setWatchPaths', function () {
 
-            var taskMock,
-                setFullPathsMock;
+            var subTask,
+                setFullPathsMock,
+                setWatchPathsMock;
 
-        })
+            before(function () {
+
+                setWatchPathsMock = get('setWatchPaths');
+
+                setFullPathsMock = set('setFullPaths', function (paths) {
+
+                    return paths.map(function (el) {
+
+                        return '/fullpath/' + el;
+                    });
+                });
+            });
+
+            describe('watch is array', function () {
+
+                before(function () {
+
+                    subTask = {
+                        watch: [
+                            'test/',
+                        ]
+                    };
+                });
+
+                it('should add project path to watch path', function () {
+
+                    expect(setWatchPathsMock(subTask))
+                        .to.be.an('array')
+                        .to.eql([
+                            '/fullpath/test/'
+                        ]);
+                });
+            });
+
+            describe('watch is true', function () {
+
+                before(function () {
+
+                    subTask = {
+                        watch: true,
+                        src: {
+                            include: [
+                                'src/'
+                            ],
+                            exclude: [
+                                'src/private/'
+                            ]
+                        }
+                    };
+                });
+
+                it('should set src as watch path', function () {
+
+                    expect(setWatchPathsMock(subTask))
+                        .to.be.an('array')
+                        .to.eql([
+                            '/fullpath/src/',
+                            '/fullpath/src/private/'
+                        ]);
+                });
+            });
+
+
+            describe('watch is false', function () {
+
+                before(function () {
+
+                    subTask = {
+                        watch: false
+                    };
+                });
+
+                it('should return empty array', function () {
+
+                    expect(setWatchPathsMock(subTask))
+                        .to.be.an('array')
+                        .to.be.length(0);
+                });
+            });
+
+            after(function () {
+
+                setFullPathsMock();
+            })
+        });
+
+        describe('setWatch', function () {
+
+            var setWatchPaths,
+                minimizePathMock,
+                setWatchPathsMock,
+                setWatch;
+
+            before(function () {
+
+                setWatch = get('setWatch');
+
+                minimizePathMock = set('minimizePathMock', function (path) {
+
+                });
+            })
+        });
     });
 });
