@@ -777,6 +777,11 @@ function setConfigEnvironment(config, env) {
                     }
                 });
             }
+
+            if(config.name === 'global') {
+                console.log(task[item]);
+            }
+
         }
     });
 
