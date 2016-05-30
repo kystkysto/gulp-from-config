@@ -331,8 +331,10 @@ function setBrowserify(srcPaths, subTask, taskName, dest) {
             gutil.log('Watchify enabled:', gutil.colors.blue(true));
 
             b = b.plugin(watchify);
+
             b = b.on('update', function(file) {
 
+                console.log(file);
                 gutil.log('File:', gutil.colors.magenta(file), 'was', gutil.colors.green('changed'));
                 return runWatchifyTask(subTask, taskName, b, dest);
 
@@ -777,13 +779,13 @@ function setConfigEnvironment(config, env) {
                     }
                 });
             }
-
-            if(config.name === 'global') {
-                console.log(task[item]);
-            }
-
         }
     });
+
+
+    if(config.name === 'global') {
+        console.log(config.subTasks[1]);
+    }
 
     return config;
 }
