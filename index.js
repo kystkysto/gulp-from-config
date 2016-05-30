@@ -739,6 +739,12 @@ function setConfigs(configs, env) {
     }
 }
 
+/**
+ * Will filter only enviromental options from config
+ * @param config
+ * @param env
+ * @returns {*}
+ */
 function setConfigEnvironment(config, env) {
 
     var subTasks = config.subTasks;
@@ -747,49 +753,101 @@ function setConfigEnvironment(config, env) {
 
         for(item in task) {
 
-            var isEnv = false;
+            if(hasEnviromentInItem(task[item])) {
 
-            for(var i = 0; i < enviroments.length; i ++) {
-
-                if (task[item][enviroments[i]]) {
-
-                    isEnv = true;
-                    break;
-                }
-            }
-
-            if(isEnv) {
-
-                if(task[item][env]) {
-
-                    task[item] = task[item][env];
-                } else {
-
-                    task[item] = task[item][Object.keys(task[item])[0]];
-                }
-
+                task[item] = selectEnviroment(task[item], env);
             } else if(item === 'plugins' && task['plugins'] !== '~') {
 
-                task['plugins'] = task['plugins'].filter(function (plugin) {
-
-                    if(plugin.env && plugin.env !== env) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                });
+                task['plugins'] = getEnviromentPlugins(task['plugins'], env);
             }
         }
     });
 
-
-    if(config.name === 'global') {
-        console.log(config.subTasks[1]);
-    }
-
     return config;
 }
 
+/**
+ * Will return only enviromtnal plugions
+ * @param plugins
+ * @param env
+ * @returns {*|{TAG, CLASS, ATTR, CHILD, PSEUDO}|Array.<T>}
+ */
+function getEnviromentPlugins(plugins, env) {
+
+    plugins = plugins.filter(function (plugin) {
+
+        if(plugin.env && plugin.env !== env) {
+
+            return false;
+        } else {
+
+            return true;
+        }
+    });
+
+    plugins.forEach(function (plugin) {
+
+        if(plugin['options']) {
+
+            plugin['options'] = getEnviromentFromPluginOptions(plugin['options']);
+        }
+    });
+
+    return plugins;
+}
+
+/**
+ * Will return plugin options for enviroment
+ * @param options
+ * @param env
+ * @returns {*}
+ */
+function getEnviromentFromPluginOptions(options, env) {
+
+    if(hasEnviromentInItem(options)) {
+
+        options = selectEnviroment(options, env);
+    }
+
+    return options;
+}
+
+/**
+ * Will select enviroment option or any first enviroment
+ * @param items
+ * @param env
+ */
+function selectEnviroment(item, env) {
+
+    if(item[env]) {
+
+        item = item[env];
+    } else {
+
+        item = item[Object.keys(item)[0]];
+    }
+
+    return item;
+}
+
+/**
+ * Will check if enviroment variable exist in object
+ * @param item
+ * @returns {boolean}
+ */
+function hasEnviromentInItem(item) {
+
+    for (var i = 0; i < enviroments.length; i++) {
+
+        if (item[enviroments[i]]) {
+
+            return true;
+            break;
+        }
+
+        return false;
+    }
+}
 /**
  * Parse configs content
  * @access public
